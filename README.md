@@ -19,7 +19,7 @@
   </a>
 </p>
 
-## 🕹️ StarknetKit
+## 🕹️ TokenboundConnectorKit
 
 Install tokenbound connectorKit with `npm`, `pnmp` or `yarn`
 
