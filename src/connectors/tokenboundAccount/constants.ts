@@ -1,4 +1,3 @@
-import { constants } from "starknet";
 
 export class ConnectorNotConnectedError extends Error {
   name = 'ConnectorNotConnectedError';

@@ -6,6 +6,7 @@ import type {
   RpcTypeToMessageMap,
   StarknetWindowObject,
 } from "@starknet-io/types-js"
+import { TBAStarknetWindowObject } from "./tokenboundAccount/types/connector"
 
 /** Connector icons, as base64 encoded svg. */
 export type ConnectorIcons = StarknetWindowObject["icon"]
@@ -58,5 +59,5 @@ export abstract class Connector extends EventEmitter<ConnectorEvents> {
 
 export abstract class StarknetkitConnector extends Connector {
   /**  Connector StarknetWindowObject */
-  abstract get wallet(): StarknetWindowObject
+  abstract get wallet(): TBAStarknetWindowObject
 }

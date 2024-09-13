@@ -2,7 +2,6 @@ import type { DisconnectOptions } from "@starknet-io/get-starknet"
 import sn from "@starknet-io/get-starknet-core"
 import type { StarknetWindowObject } from "@starknet-io/types-js"
 import { Connector, ConnectorData, StarknetkitConnector } from "./connectors"
-import { DEFAULT_WEBWALLET_URL } from "./connectors/webwallet/constants"
 import { defaultConnectors } from "./helpers/defaultConnectors"
 import { getStoreVersionFromBrowser } from "./helpers/getStoreVersionFromBrowser"
 import {
@@ -18,6 +17,7 @@ import type {
   ModalResult,
   ModalWallet,
 } from "./types/modal"
+import { TBAStarknetWindowObject } from "./connectors/tokenboundAccount/types/connector"
 
 let selectedConnector: StarknetkitConnector | null = null
 
@@ -29,12 +29,8 @@ export const connect = async ({
   resultType = "wallet",
   ...restOptions
 }: ConnectOptionsWithConnectors | ConnectOptions): Promise<ModalResult> => {
-  const {  tokenboundOptions } =
-    restOptions as ConnectOptions
-
+  const { tokenboundOptions } = restOptions as ConnectOptions
   const { connectors } = restOptions as ConnectOptionsWithConnectors
-
-  // force null in case it was disconnected from mobile app
   selectedConnector = null
   const availableConnectors =
     !connectors || connectors.length === 0
@@ -90,12 +86,13 @@ export const connect = async ({
         selectedConnector = connector
       }
 
+
       return {
         connector: selectedConnector,
         connectorData,
-        wallet: connector?.wallet ?? null,
+        wallet:  selectedConnector?.wallet ?? null,
       }
-    } // otherwise fallback to modal
+    }
   }
 
   const modalWallets: ModalWallet[] = mapModalWallets({
@@ -176,9 +173,11 @@ export const getSelectedConnectorWallet = () =>
 
 export const disconnect = async (options: DisconnectOptions = {}) => {
   removeStarknetLastConnectedWallet()
+
   if (selectedConnector) {
     await selectedConnector.disconnect()
   }
+
   selectedConnector = null
 
   return sn.disconnect(options)
@@ -188,8 +187,8 @@ export type {
   Connector,
   ConnectorData,
   DisconnectOptions,
-  StarknetWindowObject,
   StarknetkitConnector,
+  TBAStarknetWindowObject,
   defaultConnectors as starknetkitDefaultConnectors,
   ConnectOptions,
   ConnectOptionsWithConnectors,
@@ -197,4 +196,3 @@ export type {
 
 export type * from "./types/modal"
 
-export { useStarknetkitConnectModal } from "./hooks/useStarknetkitConnectModal"

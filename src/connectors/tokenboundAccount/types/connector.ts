@@ -50,16 +50,12 @@ export abstract class Connector extends EventEmitter<ConnectorEvents> {
   ): Promise<AccountInterface>  /** Get current chain id. */
   abstract chainId(): Promise<bigint>;
   // /**  Connector StarknetWindowObject */
-  abstract get wallet(): StarknetWindowObject;
+  abstract get wallet(): TBAStarknetWindowObject;
 }
 
 
 
-export interface ConnectedStarknetWindowObject {
-  id: string;
-  name: string;
-  icon: string;
-  version: string;
+export interface TBAStarknetWindowObject extends StarknetWindowObject {
   isConnected: boolean;
   chainId: string;
   selectedAddress: string;

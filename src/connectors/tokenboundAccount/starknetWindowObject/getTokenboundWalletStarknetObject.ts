@@ -1,7 +1,6 @@
 import {  getTokenboundStarknetWindowObject } from "./tokenboundStarknetWindowObject"
-
 import { TOKENBOUND_ACCOUNT_ICON } from "../constants"
-import { StarknetWindowObject } from "@starknet-io/types-js"
+import { TBAStarknetWindowObject } from "../types/connector"
 
 
 
@@ -16,24 +15,29 @@ export type ModalEvents =
 
 interface Options {
   address: string;
-  wallet: StarknetWindowObject,
+  wallet: TBAStarknetWindowObject,
   chainId: string
 }
 
 export const getTokenboundAccountStarknetObject = async ({ address, wallet, chainId }: Options
-): Promise<StarknetWindowObject> => {
+): Promise<TBAStarknetWindowObject> => {
+
 
   const globalWindow = typeof window !== "undefined" ? window : undefined
   if (!globalWindow) {
     throw new Error("window is not defined")
   }
-
   const starknetWindowObject = getTokenboundStarknetWindowObject(
     {
       id: "TBA",
       icon: TOKENBOUND_ACCOUNT_ICON,
       name: "Tokenbound Account",
       version: "1.0.0",
+      chainId: "",
+      isConnected: false,
+      selectedAddress: "",
+      account: wallet.account,
+      provider: wallet.provider
     },
     address,
     wallet,

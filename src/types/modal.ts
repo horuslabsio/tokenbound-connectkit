@@ -1,11 +1,11 @@
 import type { GetWalletOptions } from "@starknet-io/get-starknet-core"
-import { StarknetWindowObject } from "@starknet-io/types-js"
 import type {
   ConnectorData,
   ConnectorIcons,
   StarknetkitConnector,
 } from "../connectors/connector"
 import { TokenboundConnectorOptions } from "src/connectors"
+import { TBAStarknetWindowObject } from "src/main"
 
 export type StoreVersion = "chrome" | "firefox" | "edge"
 
@@ -37,7 +37,7 @@ export type ModalWallet = {
 export type ModalResult = {
   connector: StarknetkitConnector | null
   connectorData: ConnectorData | null
-  wallet?: StarknetWindowObject | null
+  wallet?: TBAStarknetWindowObject | null
 }
 
 

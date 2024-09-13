@@ -1,23 +1,4 @@
-<!-- logo -->
-<p align="center">
-  <img width='300' src="https://starknetkit-website-git-blo-1541-argentlabs.vercel.app/starknetKit-logo.svg">
-</p>
 
-<!-- primary badges -->
-<p align="center">
-  <a href="https://www.npmjs.com/package/starknetkit">
-    <img src='https://img.shields.io/npm/v/starknetkit' />
-  </a>
-  <a href="https://bundlephobia.com/package/starknetkit">
-    <img src='https://img.shields.io/bundlephobia/minzip/starknet?color=success&label=size' />
-  </a>
-  <a href="https://www.npmjs.com/package/starknetkit">
-    <img src='https://img.shields.io/npm/dt/starknetkit?color=blueviolet' />
-  </a>
-  <a href="https://github.com/argentlabs/starknetkit/blob/main/LICENSE/">
-    <img src="https://img.shields.io/badge/license-MIT-black">
-  </a>
-</p>
 
 ## 🕹️ TokenboundConnectorKit
 
@@ -72,7 +53,7 @@ const wallet = await connect({ modalMode: "neverAsk" })
 ## Disconnect a wallet
 
 ```js
-await disconnect({ clearLastWallet: true })
+await disconnect()
 ```
 
 
