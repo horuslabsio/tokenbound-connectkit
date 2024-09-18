@@ -1,6 +1,6 @@
 
 
-## 🕹️ TokenboundConnectorKit
+## 🕹️ Tokenbound ConnectKit
 
 Install tokenbound connectorKit with `npm`, `pnmp` or `yarn`
 
@@ -40,8 +40,6 @@ const connectTBA = async () => {
      alert((e as any).message)
    }
  }
-
-
 ```
 
 ## Reconnect to a previously connected wallet on load:
@@ -54,9 +52,6 @@ const wallet = await connect({ modalMode: "neverAsk" })
 
 ```js
 await disconnect()
-```
-
-
 ```
 
 ## 📕 Guides
