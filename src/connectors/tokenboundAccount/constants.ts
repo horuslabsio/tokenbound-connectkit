@@ -26,7 +26,7 @@ export const ARGENT_WEBWALLET_ICON  = `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0
 export const ARGENT_WEBWALLET_URL = "https://web.argent.xyz";
 
 
-export const DEFAULT_TOKENBOUNDACCOUNT_URL= "https://tba-sdk-ui.vercel.app/"
+export const DEFAULT_TOKENBOUNDACCOUNT_URL= "https://connect.tbaexplorer.com/"
 
 export const TESTNET_WHITELIST_URL =
   "https://static.hydrogen.argent47.net/webwallet/iframe_whitelist_testnet.json"
