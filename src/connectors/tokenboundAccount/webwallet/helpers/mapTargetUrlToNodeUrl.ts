@@ -1,4 +1,4 @@
-import { getRandomPublicRPCNode } from "../../../helpers/publicRcpNodes"
+import { getRandomPublicRPCNode } from "./publicRcpNodes"
 
 export function mapTargetUrlToNodeUrl(target: string): string {
   const publicRPCNode = getRandomPublicRPCNode()

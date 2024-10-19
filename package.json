@@ -1,5 +1,5 @@
 {
-  "name": "tokenbound-connectorkit",
+  "name": "tokenbound-connectorkit-v3",
   "version": "1.0.1",
   "repository": "https://github.com/horuslabsio/tba-connector-v2",
   "private": false,
@@ -101,6 +101,7 @@
     "vitest": "^1.6.0",
     "ws": "^8.8.1",
     "zod": "^3.20.6"
+
   },
   "peerDependencies": {
     "starknet": "^6.9.0"

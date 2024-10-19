@@ -42,3 +42,5 @@ export const RPC_NODE_URL_MAINNET =
 
 
 export const DEFAULT_CHAIN_ID = "SN_SEPOLIA"
+
+export const DEFAULT_WEBWALLET_URL = "https://web.argent.xyz"
