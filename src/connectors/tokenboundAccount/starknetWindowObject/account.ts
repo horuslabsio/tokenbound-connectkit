@@ -12,7 +12,8 @@ export class TokenboundAccount extends Account implements AccountInterface {
   constructor(
       provider: ProviderInterface,
       public address: string,
-      public parentAccount: WalletAccount
+      public parentAccount: WalletAccount,
+      public parentAddress: string
   ) {
       super(provider, address, parentAccount.signer);
   }

@@ -47,7 +47,7 @@ export const getTokenboundStarknetWindowObject = (
         case "wallet_requestAccounts": {
           try {
             const walletAccount = new WalletAccount(provider, parentWallet)
-            
+
             await updateStarknetWindowObject(
               chainId,
               provider,
@@ -127,6 +127,18 @@ export async function updateStarknetWindowObject(
 
   const { id, name, version } = wallet;
 
+  if (walletAccount && walletAccount.address) {
+
+    let account = walletAccount.address;
+    
+    console.log(account, "hello world");
+
+  } else {
+
+    console.log("Address not found in walletAccount.");
+
+  }
+
   const valuesToAssign: Pick<
     TBAStarknetWindowObject,
     | 'id'
@@ -136,6 +148,7 @@ export async function updateStarknetWindowObject(
     | 'isConnected'
     | 'chainId'
     | 'selectedAddress'
+    | 'parentAccount'
     | 'account'
     | 'provider'
   > = {
@@ -146,10 +159,12 @@ export async function updateStarknetWindowObject(
     isConnected: true,
     chainId,
     selectedAddress: tokenboundAddress,
+    parentAccount: chainId,
     account: new TokenboundAccount(
       provider,
       tokenboundAddress,
       walletAccount,
+      ""
     ),
     provider,
   };

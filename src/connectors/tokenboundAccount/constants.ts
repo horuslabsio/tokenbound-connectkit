@@ -44,3 +44,8 @@ export const RPC_NODE_URL_MAINNET =
 export const DEFAULT_CHAIN_ID = "SN_SEPOLIA"
 
 export const DEFAULT_WEBWALLET_URL = "https://web.argent.xyz"
+
+export const MAINNET_CHAIN_ID = "0x534e5f4d41494e"
+
+export const SEPOLIA_CHAIN_ID = "0x534e5f5345504f4c4941"
+

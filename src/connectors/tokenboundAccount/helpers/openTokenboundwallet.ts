@@ -4,6 +4,8 @@ import { openWebwallet } from "../webwallet/helpers/openWebwallet"
 import { TBAStarknetWindowObject } from "../types/connector"
 import { DEFAULT_WEBWALLET_URL } from "../constants"
 import { WebWalletStarknetWindowObject } from "../webwallet/starknetWindowObject/argentStarknetWindowObject"
+import {  TBAChainID, TBAVersion, WalletClient } from "starknet-tokenbound-sdk"
+import {} from "starknet"
 
 interface Options {
   address: string
@@ -54,11 +56,14 @@ export const openTokenboundModal = async (
           let wallet: TBAStarknetWindowObject | undefined;
 
           if (wallet_id === "braavos" || wallet_id === "argentx") {
+
             wallet =
               globalObject[
                 `starknet_${wallet_id === "argentx" ? "argentX" : wallet_id}`
               ];
+
           }
+
 
           if (wallet_id === "argentwebwallet") {
             const webWallet = (await openWebwallet(DEFAULT_WEBWALLET_URL)) ?? null
@@ -78,6 +83,8 @@ export const openTokenboundModal = async (
             wallet,
             chainId,
           });
+
+          
 
           resolve(starknetWindowObject);
           hideModal(modal);

@@ -1,10 +1,10 @@
 import { type AccountChangeEventHandler } from "@starknet-io/get-starknet-core"
 import {
   AccountInterface,
-  constants,
   ProviderInterface,
   ProviderOptions,
   WalletAccount,
+  num
 } from "starknet"
 import {
   Permission,
@@ -24,9 +24,10 @@ import {
   type ConnectorData,
   type ConnectorIcons,
 } from "../connector"
-import { DEFAULT_CHAIN_ID, DEFAULT_TOKENBOUNDACCOUNT_URL, TOKENBOUND_ACCOUNT_ICON } from "./constants"
+import { DEFAULT_CHAIN_ID, DEFAULT_TOKENBOUNDACCOUNT_URL, SEPOLIA_CHAIN_ID, TOKENBOUND_ACCOUNT_ICON } from "./constants"
 import { openTokenboundModal } from "./helpers/openTokenboundwallet"
 import { TBAStarknetWindowObject } from "./types/connector"
+import { TBAChainID, TBAVersion, TokenboundClient, WalletClient } from "starknet-tokenbound-sdk"
 
 export interface TokenboundConnectorOptions {
   chainId: string
@@ -92,10 +93,18 @@ export class TokenboundConnector extends Connector {
 
     const accounts = await this._wallet.request({
       type: "wallet_requestAccounts",
-      params: { silent_mode: false }, 
+      params: { silent_mode: false },
     })
 
     const chainId = await this.chainId()
+
+
+    this.hasAccountOwnership(
+      chainId.toString(), 
+      this.wallet
+    )
+
+
 
     return {
       account: accounts[0],
@@ -162,11 +171,43 @@ export class TokenboundConnector extends Connector {
     this._wallet = null
   }
 
+
+  private async hasAccountOwnership(chainId: string, wallet: TBAStarknetWindowObject) {
+    const walletClient: WalletClient = {
+      address: "0x07da6cca38Afcf430ea53581F2eFD957bCeDfF798211309812181C555978DCC3",
+      privateKey: "",
+    };
+    const formattedChainId = num.toHex(num.toBigInt(chainId))
+
+    const options = {
+      walletClient: walletClient,
+      chain_id: TBAChainID.sepolia,
+      version: TBAVersion.V3,
+      jsonRPC: `${formattedChainId === SEPOLIA_CHAIN_ID ? "https://starknet-sepolia.public.blastapi.io" : "https://starknet-mainnet.public.blastapi.io"}`,
+    };
+
+    let tbaAddress = wallet.selectedAddress
+    const tokenbound = new TokenboundClient(options);
+
+    const account = await tokenbound.getOwner({
+      tbaAddress
+    })
+
+    console.log(wallet.parentAccount,  "wallet review")
+
+    console.log(num.toHex(account), "account")
+
+  }
+
   private async ensureWallet(): Promise<void> {
+
     const hexChainId = this._options ? BigInt(getStarknetChainId(this._options.chainId)) : BigInt(getStarknetChainId(DEFAULT_CHAIN_ID))
+
     let _wallet = (await openTokenboundModal(DEFAULT_TOKENBOUNDACCOUNT_URL, hexChainId.toString())) ?? null
 
+
     if (_wallet) {
+
       this._wallet = _wallet
     }
 
