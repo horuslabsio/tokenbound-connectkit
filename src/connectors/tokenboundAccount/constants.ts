@@ -49,3 +49,9 @@ export const MAINNET_CHAIN_ID = "0x534e5f4d41494e"
 
 export const SEPOLIA_CHAIN_ID = "0x534e5f5345504f4c4941"
 
+export const SEPOLIA_NODE_URL =  "https://starknet-sepolia.public.blastapi.io"
+
+export const MAINNET_NODE_URL =  "https://starknet-mainnet.public.blastapi.io"
+
+
+export const CONTROLLER_ETH_CONTRACT = '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7';

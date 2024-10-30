@@ -131,8 +131,6 @@ export async function updateStarknetWindowObject(
 
     let account = walletAccount.address;
     
-    console.log(account, "hello world");
-
   } else {
 
     console.log("Address not found in walletAccount.");
