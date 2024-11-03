@@ -23,3 +23,15 @@ export class WalletNotFoundError extends Error {
   name = "WalletNotFoundError";
   message = "Wallet not found";
 }
+
+
+export class GetTBAOwnerFailure extends Error {
+  name = "GetTBAOwnerFailure";
+  message = "Unable to retrieve tba owner address";
+}
+
+
+export class NotTokenboundAccountOwner extends Error {
+  name = "NotTokenboundAccountOwner";
+  message = "Not TBA Owner";
+}

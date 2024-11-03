@@ -4,12 +4,13 @@ import type {
   StarknetWindowObject,
   WalletEvents,
 } from "@starknet-io/types-js"
-import { Account, AccountInterface, constants, ProviderInterface, RpcProvider, WalletAccount } from "starknet"
+import { Account, constants, ProviderInterface, RpcProvider, WalletAccount } from "starknet"
 import { TokenboundAccount } from "./account"
-import { RPC_NODE_URL_TESTNET } from "../constants"
+import { MAINNET_NODE_URL, SEPOLIA_CHAIN_ID, SEPOLIA_NODE_URL } from "../constants"
 import { TBAStarknetWindowObject } from "../types/connector"
 
 export const userEventHandlers: WalletEvents[] = []
+
 export type Variant = "argentX" | "argentWebWallet" | "TBA"
 
 export interface TBAStarknetWindowObjectOptions {
@@ -25,11 +26,7 @@ export interface TBAStarknetWindowObjectOptions {
 
 }
 
-export type LoginStatus = {
-  isLoggedIn?: boolean
-  hasSession?: boolean
-  isPreauthorized?: boolean
-}
+
 
 export const getTokenboundStarknetWindowObject = (
   options: TBAStarknetWindowObjectOptions,
@@ -38,7 +35,8 @@ export const getTokenboundStarknetWindowObject = (
   chainId: string,
 ): TBAStarknetWindowObject => {
 
-  const provider = new RpcProvider({ nodeUrl: RPC_NODE_URL_TESTNET })
+
+  const provider = new RpcProvider({ nodeUrl: chainId == SEPOLIA_CHAIN_ID ? SEPOLIA_NODE_URL : MAINNET_NODE_URL })
 
   const wallet: TBAStarknetWindowObject = {
     ...options,
@@ -46,7 +44,9 @@ export const getTokenboundStarknetWindowObject = (
       switch (call.type) {
         case "wallet_requestAccounts": {
           try {
-            const walletAccount = new WalletAccount(provider, parentWallet)
+
+
+            const walletAccount =  new WalletAccount(provider, parentWallet)
 
             await updateStarknetWindowObject(
               chainId,
@@ -56,6 +56,7 @@ export const getTokenboundStarknetWindowObject = (
               walletAccount
 
             )
+
 
             return [address]
 
@@ -97,17 +98,21 @@ export const getTokenboundStarknetWindowObject = (
       }
     },
     off: (event, handleEvent) => {
+      
       if (event !== "accountsChanged" && event !== "networkChanged") {
         throw new Error(`Unknwown event: ${event}`)
       }
+
 
       const eventIndex = userEventHandlers.findIndex(
         (userEvent) => userEvent.type === event && userEvent.handler === handleEvent
       )
 
+
       if (eventIndex >= 0) {
         userEventHandlers.splice(eventIndex, 1)
       }
+
     },
   }
   return wallet
@@ -127,15 +132,11 @@ export async function updateStarknetWindowObject(
 
   const { id, name, version } = wallet;
 
-  if (walletAccount && walletAccount.address) {
 
-    let account = walletAccount.address;
-    
-  } else {
+  console.log(await walletAccount.getChainId(), 'hgygghghghhg')
 
-    console.log("Address not found in walletAccount.");
+  console.log(walletAccount.address,  "wallet accoutn")
 
-  }
 
   const valuesToAssign: Pick<
     TBAStarknetWindowObject,
@@ -157,12 +158,12 @@ export async function updateStarknetWindowObject(
     isConnected: true,
     chainId,
     selectedAddress: tokenboundAddress,
-    parentAccount: chainId,
+    parentAccount: walletAccount.address,
     account: new TokenboundAccount(
       provider,
       tokenboundAddress,
       walletAccount,
-      ""
+    
     ),
     provider,
   };

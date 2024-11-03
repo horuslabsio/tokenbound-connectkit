@@ -46,3 +46,6 @@ export const getTokenboundAccountStarknetObject = async ({ address, wallet, chai
   )
   return starknetWindowObject
 }
+
+
+
