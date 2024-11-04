@@ -40,6 +40,7 @@ export const getTokenboundStarknetWindowObject = (
 
   const wallet: TBAStarknetWindowObject = {
     ...options,
+    
     async request(call) {
       switch (call.type) {
         case "wallet_requestAccounts": {
@@ -56,7 +57,6 @@ export const getTokenboundStarknetWindowObject = (
               walletAccount
 
             )
-
 
             return [address]
 
@@ -133,10 +133,8 @@ export async function updateStarknetWindowObject(
   const { id, name, version } = wallet;
 
 
-  console.log(await walletAccount.getChainId(), 'hgygghghghhg')
-
-  console.log(walletAccount.address,  "wallet accoutn")
-
+  // populate parent account address
+  await walletAccount.getChainId()
 
   const valuesToAssign: Pick<
     TBAStarknetWindowObject,

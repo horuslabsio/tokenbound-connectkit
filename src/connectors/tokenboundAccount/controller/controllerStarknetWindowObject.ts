@@ -44,7 +44,6 @@ export const getTokenboundControllerStarknetWindowObject =  (
             switch (call.type) {
                 case "wallet_requestAccounts": {
                     try {
-
                         await updateStarknetWindowObject(
                             chainId,
                             provider,
@@ -123,7 +122,6 @@ export async function updateStarknetWindowObject(
 
     const { id, name, version } = wallet;
 
-    
     const valuesToAssign: Pick<
         TBAStarknetWindowObject,
         | 'id'
@@ -144,18 +142,15 @@ export async function updateStarknetWindowObject(
         isConnected: true,
         chainId,
         selectedAddress: tokenboundAddress,
-        parentAccount: chainId,
-        // account: new TokenboundControllerAccount(
-        //     provider,
-        //     tokenboundAddress,
-        //     walletAccount,
-        //     ""
-        // ),
-        account: account,
+        parentAccount: account.address,
+        account: new TokenboundControllerAccount(
+            provider,
+            tokenboundAddress,
+            account,
+        ),
         provider,
     };
 
-    
     return Object.assign(wallet, valuesToAssign);
 }
 
@@ -165,8 +160,7 @@ class TokenboundControllerAccount extends Account implements AccountInterface {
     constructor(
         provider: ProviderInterface,
         public address: string,
-        public parentAccount: WalletAccount,
-        public parentAddress: string
+        public parentAccount: Account,
     ) {
         super(provider, address, parentAccount.signer);
     }

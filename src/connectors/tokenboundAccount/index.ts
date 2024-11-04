@@ -16,8 +16,6 @@ import {
 import {
   ConnectorNotConnectedError,
   ConnectorNotFoundError,
-  GetTBAOwnerFailure,
-  NotTokenboundAccountOwner,
   UserRejectedRequestError,
 } from "../../errors"
 import { getStarknetChainId } from "../../helpers/getStarknetChainId"
@@ -103,15 +101,15 @@ export class TokenboundConnector extends Connector {
     const chainId = await this.chainId()
 
 
-   const isOwnerofTBA =  await this.hasAccountOwnership(
-      chainId.toString(),
-      this.wallet
-    )
+  //  const isOwnerofTBA =  await this.hasAccountOwnership(
+  //     chainId.toString(),
+  //     this.wallet
+  //   )
 
-    if(!isOwnerofTBA){
-      throw new NotTokenboundAccountOwner()
+  //   if(!isOwnerofTBA){
+  //     throw new NotTokenboundAccountOwner()
 
-    }
+  //   }
 
     return {
       account: accounts[0],
@@ -148,8 +146,6 @@ export class TokenboundConnector extends Connector {
 
     const hexChainId = getStarknetChainId(chainId)
 
-
-    console.log(chainId, "from here")
 
     return BigInt(hexChainId)
 
@@ -190,11 +186,12 @@ export class TokenboundConnector extends Connector {
 
 
   private async hasAccountOwnership(chainId: string, wallet: TBAStarknetWindowObject): Promise<boolean> {
-    const NODE_URL = num.toHex(chainId) === SEPOLIA_CHAIN_ID ? SEPOLIA_NODE_URL : MAINNET_NODE_URL;
+    const NODE_URL =  num.toHex(chainId) === SEPOLIA_CHAIN_ID ? SEPOLIA_NODE_URL : MAINNET_NODE_URL;
 
     const provider = new RpcProvider({ nodeUrl: NODE_URL });
   
     const tbaClassHash = await provider.getClassHashAt(wallet.selectedAddress);
+
 
     const network = num.toHex(chainId) === SEPOLIA_CHAIN_ID ? "sepolia" : "mainnet";
   
@@ -223,9 +220,11 @@ export class TokenboundConnector extends Connector {
     };
   
     try {
+
       const tokenbound = new TokenboundClient(options);
-      const account = await tokenbound.getOwner({ tbaAddress: wallet.selectedAddress });
-      return num.toHex(account) === wallet.parentAccount;
+      const owner = await tokenbound.getOwner({ tbaAddress: wallet.selectedAddress });
+      const account = num.toHex(owner)
+      return account === wallet.parentAccount;
     } catch (e) {
       console.error("Failed to get TBA owner:", e);
       return false;
@@ -237,9 +236,7 @@ export class TokenboundConnector extends Connector {
 
 
   private async ensureWallet(): Promise<void> {
-
     const hexChainId = this._options ? BigInt(getStarknetChainId(this._options.chainId)) : BigInt(getStarknetChainId(DEFAULT_CHAIN_ID))
-
     let _wallet = (await openTokenboundModal(DEFAULT_TOKENBOUNDACCOUNT_URL, hexChainId.toString())) ?? null
     if (_wallet) {
       this._wallet = _wallet

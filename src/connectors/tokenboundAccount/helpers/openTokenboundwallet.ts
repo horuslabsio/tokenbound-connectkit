@@ -70,7 +70,6 @@ export const openTokenboundModal = async (
           
           // catridge controller
           else if (wallet_id === "controller") {
-
             let account = controller;
             const { channel } = account;
             const provider = new RpcProvider({ nodeUrl: channel.nodeUrl });
