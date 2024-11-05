@@ -37,7 +37,7 @@ export const getTokenboundAccountStarknetObject = async ({ address, wallet, chai
       isConnected: false,
       selectedAddress: "",
       account: wallet.account,
-      provider: wallet.provider
+      provider: wallet.provider,
     },
     address,
     wallet,
@@ -46,3 +46,6 @@ export const getTokenboundAccountStarknetObject = async ({ address, wallet, chai
   )
   return starknetWindowObject
 }
+
+
+

@@ -61,4 +61,5 @@ export interface TBAStarknetWindowObject extends StarknetWindowObject {
   selectedAddress: string;
   account: Account;  
   provider: ProviderInterface;  
+  parentAccount?: string
 }

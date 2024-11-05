@@ -57,6 +57,7 @@ export const openWebwallet = async (
   }
 
   const network = mapTargetUrlToNetworkId(origin)
+  
   const { allowedDapps } = await fetchAllowedDapps(network)
 
   if (allowedDapps.includes(window.location.hostname)) {

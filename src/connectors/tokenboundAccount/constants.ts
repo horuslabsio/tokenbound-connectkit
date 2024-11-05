@@ -26,7 +26,7 @@ export const ARGENT_WEBWALLET_ICON  = `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0
 export const ARGENT_WEBWALLET_URL = "https://web.argent.xyz";
 
 
-export const DEFAULT_TOKENBOUNDACCOUNT_URL= "https://connect.tbaexplorer.com/"
+export const DEFAULT_TOKENBOUNDACCOUNT_URL= "https://connect.tbaexplorer.com"
 
 export const TESTNET_WHITELIST_URL =
   "https://static.hydrogen.argent47.net/webwallet/iframe_whitelist_testnet.json"
@@ -44,3 +44,27 @@ export const RPC_NODE_URL_MAINNET =
 export const DEFAULT_CHAIN_ID = "SN_SEPOLIA"
 
 export const DEFAULT_WEBWALLET_URL = "https://web.argent.xyz"
+
+export const MAINNET_CHAIN_ID = "0x534e5f4d41494e"
+
+export const SEPOLIA_CHAIN_ID = "0x534e5f5345504f4c4941"
+
+export const SEPOLIA_NODE_URL =  "https://starknet-sepolia.public.blastapi.io"
+
+export const MAINNET_NODE_URL =  "https://starknet-mainnet.public.blastapi.io"
+
+
+export const AccountClassHashes = {
+  V2: {
+    mainnet:
+      "0x45d67b8590561c9b54e14dd309c9f38c4e2c554dd59414021f9d079811621bd",
+    sepolia:
+      "0x45d67b8590561c9b54e14dd309c9f38c4e2c554dd59414021f9d079811621bd",
+  },
+  V3: {
+    mainnet:
+      "0x3d311ba322e1f900d669586b191a2a82c50f6cb850563a8e1c01c7bac9be7b0",
+    sepolia:
+      "0x29d2a1b11dd97289e18042502f11356133a2201dd19e716813fb01fbee9e9a4",
+  },
+};
