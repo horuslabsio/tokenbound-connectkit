@@ -27,6 +27,8 @@ export const getTokenboundAccountStarknetObject = async ({ address, wallet, chai
   if (!globalWindow) {
     throw new Error("window is not defined")
   }
+
+  const {id} = wallet;
   const starknetWindowObject = getTokenboundStarknetWindowObject(
     {
       id: "TBA",
@@ -34,6 +36,7 @@ export const getTokenboundAccountStarknetObject = async ({ address, wallet, chai
       name: "Tokenbound Account",
       version: "1.0.0",
       chainId: "",
+      parentAccountId: id,
       isConnected: false,
       selectedAddress: "",
       account: wallet.account,

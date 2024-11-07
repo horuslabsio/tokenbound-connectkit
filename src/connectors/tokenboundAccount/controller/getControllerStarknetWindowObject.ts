@@ -28,8 +28,10 @@ export const getTokenboundAccountController = async ({ address, account, provide
         name: "Tokenbound Account",
         version: "1.0.0",
         chainId: chainId,
+        parentAccountId: "",
         isConnected: false,
         selectedAddress: "",
+        
         account: account,
         provider: provider
     },

@@ -4,15 +4,10 @@ import type {
     StarknetWindowObject,
     WalletEvents,
 } from "@starknet-io/types-js"
-import { Account, AccountInterface, Call, CallData, constants, ProviderInterface, RawArgs, RpcProvider, WalletAccount, } from "starknet"
-import { MAINNET_NODE_URL, SEPOLIA_CHAIN_ID, SEPOLIA_NODE_URL } from "../constants"
+import { Account, AccountInterface, Call, CallData, constants, ProviderInterface, RawArgs } from "starknet"
 import { TBAStarknetWindowObject } from "../types/connector"
 
-
-
-
 export const userEventHandlers: WalletEvents[] = []
-
 export type Variant = "argentX" | "argentWebWallet" | "TBA"
 
 export interface TBAStarknetWindowObjectOptions {
@@ -22,22 +17,18 @@ export interface TBAStarknetWindowObjectOptions {
     version: string
     isConnected: boolean
     selectedAddress: string
+    parentAccountId: string
     account: Account
     provider: ProviderInterface,
     chainId: string
 
 }
 
-
-
 export const getTokenboundControllerStarknetWindowObject =  (
     options: TBAStarknetWindowObjectOptions,
     address: string,
 ): TBAStarknetWindowObject => {
-
     const { provider, account, chainId } = options;
-
-
     const wallet: TBAStarknetWindowObject = {
         ...options,
         async request(call) {
@@ -109,8 +100,6 @@ export const getTokenboundControllerStarknetWindowObject =  (
 }
 
 
-
-
 export async function updateStarknetWindowObject(
     chainId: string,
     provider: ProviderInterface,
@@ -131,6 +120,7 @@ export async function updateStarknetWindowObject(
         | 'isConnected'
         | 'chainId'
         | 'selectedAddress'
+        | 'parentAccountId'
         | 'parentAccount'
         | 'account'
         | 'provider'
@@ -142,6 +132,7 @@ export async function updateStarknetWindowObject(
         isConnected: true,
         chainId,
         selectedAddress: tokenboundAddress,
+        parentAccountId: "catridge",
         parentAccount: account.address,
         account: new TokenboundControllerAccount(
             provider,
@@ -150,7 +141,6 @@ export async function updateStarknetWindowObject(
         ),
         provider,
     };
-
     return Object.assign(wallet, valuesToAssign);
 }
 
@@ -164,13 +154,11 @@ class TokenboundControllerAccount extends Account implements AccountInterface {
     ) {
         super(provider, address, parentAccount.signer);
     }
-
     override execute = async (
         calls: Call[]
     ) => {
         try {
             const transactions = Array.isArray(calls) ? calls : [calls];
-
             const txns = transactions.map((call) => ({
                 contractAddress: call.contractAddress,
                 entrypoint: call.entrypoint,
@@ -178,13 +166,11 @@ class TokenboundControllerAccount extends Account implements AccountInterface {
                     ? call.calldata
                     : CallData.compile(call.calldata as RawArgs)
             }))
-
             let callToBeExecuted: Call = {
                 contractAddress: this.address,
                 entrypoint: '__execute__',
                 calldata: CallData.compile({ txns })
             }
-
             return await this.parentAccount.execute(callToBeExecuted)
         }
         catch (error) {

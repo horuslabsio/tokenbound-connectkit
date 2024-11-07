@@ -1,6 +1,5 @@
 import type { DisconnectOptions } from "@starknet-io/get-starknet"
 import sn from "@starknet-io/get-starknet-core"
-import type { StarknetWindowObject } from "@starknet-io/types-js"
 import { Connector, ConnectorData, StarknetkitConnector } from "./connectors"
 import { defaultConnectors } from "./helpers/defaultConnectors"
 import { getStoreVersionFromBrowser } from "./helpers/getStoreVersionFromBrowser"
@@ -9,7 +8,10 @@ import {
   setStarknetLastConnectedWallet,
 } from "./helpers/lastConnected"
 import { mapModalWallets } from "./helpers/mapModalWallets"
+
+
 import Modal from "./modal/Modal.svelte"
+
 import css from "./theme.css?inline"
 import type {
   ConnectOptions,
@@ -22,7 +24,7 @@ import { TBAStarknetWindowObject } from "./connectors/tokenboundAccount/types/co
 let selectedConnector: StarknetkitConnector | null = null
 
 export const connect = async ({
-  modalMode = "canAsk",
+  modalMode = "alwaysAsk",
   storeVersion = getStoreVersionFromBrowser(),
   modalTheme,
   dappName,
@@ -42,8 +44,8 @@ export const connect = async ({
   const lastWalletId = localStorage.getItem("starknetLastConnectedWallet")
   if (modalMode === "neverAsk") {
     try {
-      const connector =
-        availableConnectors.find((c) => c.id === lastWalletId) ?? null
+      const connector = availableConnectors.find((c) => c.id === lastWalletId) ?? null
+    
       let connectorData: ConnectorData | null = null
 
       if (connector && resultType === "wallet") {
@@ -64,7 +66,8 @@ export const connect = async ({
   const installedWallets = await sn.getAvailableWallets(restOptions)
 
   // we return/display wallet options once per first-dapp (ever) connect
-  if (modalMode === "canAsk" && lastWalletId) {
+  if (modalMode === "canAsk") {
+
     const authorizedWallets = await sn.getAuthorizedWallets(restOptions)
 
     const wallet =
@@ -72,6 +75,8 @@ export const connect = async ({
       installedWallets.length === 1)
         ? installedWallets[0]
         : undefined
+
+
 
     if (wallet) {
       const connector = availableConnectors.find((c) => c.id === lastWalletId)
@@ -86,13 +91,16 @@ export const connect = async ({
         selectedConnector = connector
       }
 
-
       return {
         connector: selectedConnector,
         connectorData,
         wallet:  selectedConnector?.wallet ?? null,
       }
+      
     }
+
+
+
   }
 
   const modalWallets: ModalWallet[] = mapModalWallets({
@@ -103,10 +111,10 @@ export const connect = async ({
     customOrder: connectors ? connectors?.length > 0 : false,
   })
 
+
   const getTarget = (): ShadowRoot => {
     const modalId = "starknetkit-modal-container"
     const existingElement = document.getElementById(modalId)
-
     if (existingElement) {
       if (existingElement.shadowRoot) {
         // element already exists, use the existing as target
@@ -136,24 +144,25 @@ export const connect = async ({
           try {
             selectedConnector = connector
             const connectorData = (await connector?.connect()) ?? null
-
             if (resultType === "wallet") {
               if (connector !== null) {
-                setStarknetLastConnectedWallet(connector.id)
+                setStarknetLastConnectedWallet(connector.wallet.parentAccountId)
               }
-
               resolve({
                 connector,
                 connectorData,
                 wallet: connector?.wallet ?? null,
               })
-            } else {
+            } 
+            
+            else {
               resolve({
                 connector,
                 wallet: null,
                 connectorData,
               })
             }
+
           } catch (error) {
             reject(error)
           } finally {
@@ -164,7 +173,11 @@ export const connect = async ({
         modalWallets,
       },
     })
+
+
   })
+
+
 }
 
 // Should be used after a sucessful connect
@@ -172,14 +185,12 @@ export const getSelectedConnectorWallet = () =>
   selectedConnector ? selectedConnector.wallet : null
 
 export const disconnect = async (options: DisconnectOptions = {}) => {
-  removeStarknetLastConnectedWallet()
 
+  removeStarknetLastConnectedWallet()
   if (selectedConnector) {
     await selectedConnector.disconnect()
   }
-
   selectedConnector = null
-
   return sn.disconnect(options)
 }
 

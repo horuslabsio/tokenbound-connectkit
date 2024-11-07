@@ -33,5 +33,11 @@ export class GetTBAOwnerFailure extends Error {
 
 export class NotTokenboundAccountOwner extends Error {
   name = "NotTokenboundAccountOwner";
-  message = "Not TBA Owner";
+  message = "User is not the Token Bound Account owner.";
+}
+
+
+export class NotAuthorizedError extends Error {
+  name = "NotAuthorizedError";
+  message = "Not Authorized";
 }

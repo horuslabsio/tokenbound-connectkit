@@ -34,12 +34,6 @@ export const TESTNET_WHITELIST_URL =
 export const MAINNET_WHITELIST_URL =
   "https://static.argent.net/webwallet/iframe_whitelist_mainnet.json"
 
-export const RPC_NODE_URL_TESTNET =
-  "https://api.hydrogen.argent47.net/v1/starknet/goerli/rpc/v0.6"
-
-export const RPC_NODE_URL_MAINNET =
-  "https://cloud.argent-api.com/v1/starknet/mainnet/rpc/v0.6"
-
 
 export const DEFAULT_CHAIN_ID = "SN_SEPOLIA"
 
@@ -49,9 +43,9 @@ export const MAINNET_CHAIN_ID = "0x534e5f4d41494e"
 
 export const SEPOLIA_CHAIN_ID = "0x534e5f5345504f4c4941"
 
-export const SEPOLIA_NODE_URL =  "https://starknet-sepolia.public.blastapi.io"
+export const SEPOLIA_NODE_URL =  "https://starknet-sepolia.public.blastapi.io/rpc/v0_7"
 
-export const MAINNET_NODE_URL =  "https://starknet-mainnet.public.blastapi.io"
+export const MAINNET_NODE_URL =  "https://starknet-mainnet.public.blastapi.io/rpc/v0_7"
 
 
 export const AccountClassHashes = {

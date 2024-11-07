@@ -72,6 +72,7 @@ export const getArgentStarknetWindowObject = (
             height: SIGN_MESSAGE_POPUP_HEIGHT,
             location: isSession ? "/signSessionKeys" : "/signMessage",
           })
+          
           const data = Array.isArray(call.params) ? call.params : [call.params]
           return proxyLink.signTypedData.mutate(data as any)
         }

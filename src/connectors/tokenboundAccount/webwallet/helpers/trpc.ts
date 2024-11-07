@@ -183,6 +183,8 @@ export const trpcProxyClient = ({
             let popup: Window | null = null
             const webwalletBtn = document.createElement("button")
             webwalletBtn.style.display = "none"
+
+            
             webwalletBtn.addEventListener("click", () => {
               popup = window.open(
                 `${popupOrigin}${popupLocation}`,

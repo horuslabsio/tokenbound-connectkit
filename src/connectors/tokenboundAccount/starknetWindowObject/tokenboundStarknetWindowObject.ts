@@ -4,10 +4,12 @@ import type {
   StarknetWindowObject,
   WalletEvents,
 } from "@starknet-io/types-js"
-import { Account, constants, ProviderInterface, RpcProvider, WalletAccount } from "starknet"
+import { Account, constants, num, ProviderInterface, RpcProvider, WalletAccount } from "starknet"
 import { TokenboundAccount } from "./account"
 import { MAINNET_NODE_URL, SEPOLIA_CHAIN_ID, SEPOLIA_NODE_URL } from "../constants"
 import { TBAStarknetWindowObject } from "../types/connector"
+import hasAccountOwnership from "../helpers/isTBAOwner"
+import hasApprove from "../helpers/hasApprove"
 
 export const userEventHandlers: WalletEvents[] = []
 
@@ -19,6 +21,7 @@ export interface TBAStarknetWindowObjectOptions {
   name: string
   version: string
   isConnected: boolean
+  parentAccountId: string;
   chainId: string
   selectedAddress: string
   account: Account
@@ -34,32 +37,25 @@ export const getTokenboundStarknetWindowObject = (
   parentWallet: StarknetWindowObject,
   chainId: string,
 ): TBAStarknetWindowObject => {
-
-
   const provider = new RpcProvider({ nodeUrl: chainId == SEPOLIA_CHAIN_ID ? SEPOLIA_NODE_URL : MAINNET_NODE_URL })
-
   const wallet: TBAStarknetWindowObject = {
     ...options,
-    
+
     async request(call) {
       switch (call.type) {
         case "wallet_requestAccounts": {
           try {
 
+            const walletAccount = new WalletAccount(provider, parentWallet)
 
-            const walletAccount =  new WalletAccount(provider, parentWallet)
-
-            await updateStarknetWindowObject(
-              chainId,
-              provider,
-              wallet,
-              address,
-              walletAccount
-
-            )
-
-            return [address]
-
+              await updateStarknetWindowObject(
+                chainId,
+                provider,
+                wallet,
+                address,
+                walletAccount
+              )
+              return [address]
           } catch (error) {
             if (error instanceof Error) {
               throw new Error(error.message)
@@ -69,7 +65,7 @@ export const getTokenboundStarknetWindowObject = (
         }
 
         case "wallet_getPermissions": {
-          throw new Error("not implemented")
+          throw new Error("Not Implemented")
         }
 
         case "wallet_requestChainId": {
@@ -98,7 +94,7 @@ export const getTokenboundStarknetWindowObject = (
       }
     },
     off: (event, handleEvent) => {
-      
+
       if (event !== "accountsChanged" && event !== "networkChanged") {
         throw new Error(`Unknwown event: ${event}`)
       }
@@ -124,17 +120,32 @@ export const getTokenboundStarknetWindowObject = (
 export async function updateStarknetWindowObject(
   chainId: string,
   provider: ProviderInterface,
-  wallet: StarknetWindowObject,
+  wallet: TBAStarknetWindowObject,
   tokenboundAddress: string,
   walletAccount: WalletAccount,
 
 ): Promise<TBAStarknetWindowObject> {
 
-  const { id, name, version } = wallet;
+    const { id, name, version, parentAccountId,  } = wallet;
+    await walletAccount.getChainId();
+    const parentAccountAddress: string = walletAccount.address;
+
+    // const isApprove = await hasApprove(wallet)
+    // if (!isApprove) {
+    //   throw new Error("Parent Wallet Not Approved")
+    // }
+
+    const isOwnerofTBA = await hasAccountOwnership(
+        chainId.toString(),
+        tokenboundAddress,
+        parentAccountAddress
+      )
+    
+      if (!isOwnerofTBA) {
+          throw new Error("Connected Wallet Not TBA Owner")
+      }
 
 
-  // populate parent account address
-  await walletAccount.getChainId()
 
   const valuesToAssign: Pick<
     TBAStarknetWindowObject,
@@ -145,6 +156,7 @@ export async function updateStarknetWindowObject(
     | 'isConnected'
     | 'chainId'
     | 'selectedAddress'
+    | 'parentAccountId'
     | 'parentAccount'
     | 'account'
     | 'provider'
@@ -154,16 +166,18 @@ export async function updateStarknetWindowObject(
     icon: "light",
     version: version,
     isConnected: true,
-    chainId,
+    chainId: num.toHex(chainId),
     selectedAddress: tokenboundAddress,
-    parentAccount: walletAccount.address,
+    parentAccount: parentAccountAddress,
+    parentAccountId: parentAccountId,
     account: new TokenboundAccount(
       provider,
       tokenboundAddress,
       walletAccount,
-    
+
     ),
     provider,
   };
+
   return Object.assign(wallet, valuesToAssign);
 }

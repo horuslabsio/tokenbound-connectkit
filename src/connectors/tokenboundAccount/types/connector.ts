@@ -60,6 +60,7 @@ export interface TBAStarknetWindowObject extends StarknetWindowObject {
   chainId: string;
   selectedAddress: string;
   account: Account;  
+  parentAccountId: string;
   provider: ProviderInterface;  
   parentAccount?: string
 }
