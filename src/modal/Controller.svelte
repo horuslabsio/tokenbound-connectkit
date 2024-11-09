@@ -11,10 +11,9 @@
     controller: Controller,
   ) => void
 
-
   export let hideModal: () => void
 
-  export let rpc: string;
+  export let rpc: string
 
   let controller = new Controller({
     policies: [
@@ -41,25 +40,21 @@
         method: "allowance",
       },
     ],
-    rpc
+    rpc,
   })
 
   let loading: boolean = true
 
   async function connect() {
-    await controller.probe()
     try {
-      const account = await controller.connect()
+      await controller.probe()
+      const account: AccountInterface = await controller.connect()
       if (account) {
         onConnect(account, controller)
       }
     } catch (e) {
       console.log(e)
     }
-  }
-
-  function disconnect() {
-    controller.disconnect()
   }
 
   onMount(async () => {

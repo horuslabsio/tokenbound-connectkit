@@ -1,5 +1,3 @@
-
-
 ## 🕹️ Tokenbound ConnectKit
 
 Houses the Tokenbound Connectkit.
@@ -7,6 +5,7 @@ Houses the Tokenbound Connectkit.
 The Tokenbound Connectkit enables users connect to existing Starknet dApps with their Tokenbound accounts.
 
 ## Installation
+
 Install tokenbound connectkit with `npm`, `pnmp` or `yarn`
 
 ```bash
@@ -46,7 +45,6 @@ const connectTBA = async () => {
    }
  }
 ```
-
 
 ## Disconnect a wallet
 

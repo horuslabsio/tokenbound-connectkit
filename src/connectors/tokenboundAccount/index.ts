@@ -24,10 +24,15 @@ import {
   type ConnectorData,
   type ConnectorIcons,
 } from "../connector"
-import { DEFAULT_CHAIN_ID, DEFAULT_TOKENBOUNDACCOUNT_URL, TOKENBOUND_ACCOUNT_ICON } from "./constants"
+import {
+  DEFAULT_CHAIN_ID,
+  DEFAULT_TOKENBOUNDACCOUNT_URL,
+  TOKENBOUND_ACCOUNT_ICON,
+} from "./constants"
 import { openTokenboundModal } from "./helpers/openTokenboundwallet"
 import { TBAStarknetWindowObject } from "./types/connector"
 import Controller from "@cartridge/controller"
+import hasAccountOwnership from "./helpers/utils"
 
 export interface TokenboundConnectorOptions {
   chainId: string
@@ -56,9 +61,6 @@ export class TokenboundConnector extends Connector {
       const permissions = await this._wallet.request({
         type: "wallet_getPermissions",
       })
-
-      console.log(permissions, "permisson")
-
 
       return (permissions as Permission[]).includes(Permission.ACCOUNTS)
     } catch {
@@ -99,8 +101,8 @@ export class TokenboundConnector extends Connector {
       type: "wallet_requestAccounts",
       params: { silent_mode: false },
     })
-    const chainId = await this.chainId()
 
+    const chainId = await this.chainId()
     return {
       account: accounts[0],
       chainId,
@@ -112,44 +114,31 @@ export class TokenboundConnector extends Connector {
     if (!this.available() && !this._wallet) {
       throw new ConnectorNotFoundError()
     }
+
     if (this._controller) {
+      console.log(this._controller)
       this._controller.disconnect()
     }
     this._wallet = null
   }
 
-
-
   async account(
     provider: ProviderOptions | ProviderInterface,
   ): Promise<AccountInterface> {
-
     if (!this._wallet) {
       throw new ConnectorNotConnectedError()
-
     }
-
-
-
     return new WalletAccount(provider, this._wallet)
   }
-
-
 
   async chainId(): Promise<bigint> {
     if (!this._wallet) {
       throw new ConnectorNotConnectedError()
     }
 
-
     const chainId = this._options.chainId
-
     const hexChainId = getStarknetChainId(chainId)
-
-
     return BigInt(hexChainId)
-
-
   }
 
   async request<T extends RpcMessage["type"]>(
@@ -170,6 +159,7 @@ export class TokenboundConnector extends Connector {
     if (!this._wallet) {
       throw new ConnectorNotConnectedError()
     }
+    console.log(this.wallet)
     this._wallet.on("accountsChanged", accountChangeCb)
   }
 
@@ -181,22 +171,20 @@ export class TokenboundConnector extends Connector {
     this._wallet = null
   }
 
-
   private async ensureWallet(): Promise<void> {
-
-    const hexChainId = this._options ? BigInt(getStarknetChainId(this._options.chainId)) : BigInt(getStarknetChainId(DEFAULT_CHAIN_ID))
-    
-    let _wallet = (await openTokenboundModal(DEFAULT_TOKENBOUNDACCOUNT_URL, hexChainId.toString())) ?? null
+    const hexChainId = this._options
+      ? BigInt(getStarknetChainId(this._options.chainId))
+      : BigInt(getStarknetChainId(DEFAULT_CHAIN_ID))
+    let _wallet =
+      (await openTokenboundModal(
+        DEFAULT_TOKENBOUNDACCOUNT_URL,
+        hexChainId.toString(),
+      )) ?? null
     if (!_wallet) return
-
     const { starknetWindowObject, controller } = _wallet
-
     if (starknetWindowObject) {
       this._wallet = starknetWindowObject
       this._controller = controller ?? null
     }
   }
-
 }
-
-
