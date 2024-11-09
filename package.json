@@ -1,6 +1,6 @@
 {
   "name": "tokenbound-connectkit-test",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "repository": "https://github.com/horuslabsio/tba-connector-v2",
   "private": false,
   "browser": {
