@@ -6,10 +6,16 @@
   import { ModalWallet } from "../types/modal"
 
   export let dappName: string = window?.document.title ?? ""
+
+
   export let modalWallets: ModalWallet[]
+
+
   export let callback: (
     value: StarknetkitConnector | null,
   ) => Promise<void> = async () => {}
+
+    
   export let theme: "light" | "dark" | null = null
 
   let loadingItem: string | false = false

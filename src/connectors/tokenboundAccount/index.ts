@@ -1,11 +1,11 @@
 import { type AccountChangeEventHandler } from "@starknet-io/get-starknet-core"
 import {
   AccountInterface,
-  constants,
   ProviderInterface,
   ProviderOptions,
   WalletAccount,
 } from "starknet"
+
 import {
   Permission,
   RequestFnCall,
@@ -24,9 +24,15 @@ import {
   type ConnectorData,
   type ConnectorIcons,
 } from "../connector"
-import { DEFAULT_CHAIN_ID, DEFAULT_TOKENBOUNDACCOUNT_URL, TOKENBOUND_ACCOUNT_ICON } from "./constants"
+import {
+  DEFAULT_CHAIN_ID,
+  DEFAULT_TOKENBOUNDACCOUNT_URL,
+  TOKENBOUND_ACCOUNT_ICON,
+} from "./constants"
 import { openTokenboundModal } from "./helpers/openTokenboundwallet"
 import { TBAStarknetWindowObject } from "./types/connector"
+import Controller from "@cartridge/controller"
+import hasAccountOwnership from "./helpers/utils"
 
 export interface TokenboundConnectorOptions {
   chainId: string
@@ -35,6 +41,7 @@ export interface TokenboundConnectorOptions {
 export class TokenboundConnector extends Connector {
   private _wallet: TBAStarknetWindowObject | null = null
   private _options: TokenboundConnectorOptions
+  private _controller: Controller | null = null
 
   constructor(options: TokenboundConnectorOptions) {
     super()
@@ -80,6 +87,7 @@ export class TokenboundConnector extends Connector {
     if (!this._wallet) {
       throw new ConnectorNotConnectedError()
     }
+
     return this._wallet
   }
 
@@ -89,14 +97,12 @@ export class TokenboundConnector extends Connector {
     if (!this._wallet) {
       throw new ConnectorNotFoundError()
     }
-
     const accounts = await this._wallet.request({
       type: "wallet_requestAccounts",
-      params: { silent_mode: false }, 
+      params: { silent_mode: false },
     })
 
     const chainId = await this.chainId()
-
     return {
       account: accounts[0],
       chainId,
@@ -105,11 +111,14 @@ export class TokenboundConnector extends Connector {
 
   async disconnect(): Promise<void> {
     resetWalletConnect()
-
     if (!this.available() && !this._wallet) {
       throw new ConnectorNotFoundError()
     }
 
+    if (this._controller) {
+      console.log(this._controller)
+      this._controller.disconnect()
+    }
     this._wallet = null
   }
 
@@ -119,7 +128,6 @@ export class TokenboundConnector extends Connector {
     if (!this._wallet) {
       throw new ConnectorNotConnectedError()
     }
-
     return new WalletAccount(provider, this._wallet)
   }
 
@@ -151,6 +159,7 @@ export class TokenboundConnector extends Connector {
     if (!this._wallet) {
       throw new ConnectorNotConnectedError()
     }
+    console.log(this.wallet)
     this._wallet.on("accountsChanged", accountChangeCb)
   }
 
@@ -163,14 +172,19 @@ export class TokenboundConnector extends Connector {
   }
 
   private async ensureWallet(): Promise<void> {
-    const hexChainId = this._options ? BigInt(getStarknetChainId(this._options.chainId)) : BigInt(getStarknetChainId(DEFAULT_CHAIN_ID))
-    let _wallet = (await openTokenboundModal(DEFAULT_TOKENBOUNDACCOUNT_URL, hexChainId.toString())) ?? null
-
-    if (_wallet) {
-      this._wallet = _wallet
+    const hexChainId = this._options
+      ? BigInt(getStarknetChainId(this._options.chainId))
+      : BigInt(getStarknetChainId(DEFAULT_CHAIN_ID))
+    let _wallet =
+      (await openTokenboundModal(
+        DEFAULT_TOKENBOUNDACCOUNT_URL,
+        hexChainId.toString(),
+      )) ?? null
+    if (!_wallet) return
+    const { starknetWindowObject, controller } = _wallet
+    if (starknetWindowObject) {
+      this._wallet = starknetWindowObject
+      this._controller = controller ?? null
     }
-
   }
 }
-
-

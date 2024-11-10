@@ -1,5 +1,3 @@
-
-
 ## 🕹️ Tokenbound ConnectKit
 
 Houses the Tokenbound Connectkit.
@@ -7,13 +5,14 @@ Houses the Tokenbound Connectkit.
 The Tokenbound Connectkit enables users connect to existing Starknet dApps with their Tokenbound accounts.
 
 ## Installation
-Install tokenbound connectorKit with `npm`, `pnmp` or `yarn`
+
+Install tokenbound connectkit with `npm`, `pnmp` or `yarn`
 
 ```bash
-$ npm install tokenbound-connector
+$  npm install tokenbound-connectkit
 
 # or with yarn:
-$ yarn add tokenbound-connector
+$ yarn add tokenbound-connectkit
 ```
 
 ## Imports
@@ -21,7 +20,7 @@ $ yarn add tokenbound-connector
 After installation, we get access to different methods, such as `connect`, `disconnect`, etc which we should import for use in our application:
 
 ```js
-import { connect, disconnect } from "tokenbound-connector"
+import { connect, disconnect } from "tokenbound-connectkit"
 ```
 
 ## Establishing a connection
@@ -45,12 +44,6 @@ const connectTBA = async () => {
      alert((e as any).message)
    }
  }
-```
-
-## Reconnect to a previously connected wallet on load:
-
-```js
-const wallet = await connect({ modalMode: "neverAsk" })
 ```
 
 ## Disconnect a wallet

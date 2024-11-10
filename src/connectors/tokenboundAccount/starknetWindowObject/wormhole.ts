@@ -4,10 +4,12 @@ const applyModalStyle = (iframe: HTMLIFrameElement) => {
   iframe.style.top = "50%"
   iframe.style.left = "50%"
   iframe.style.transform = "translate(-50%, -50%)"
-  iframe.style.width = "840px"
-  iframe.style.height = "540px"
-  iframe.style.backgroundColor = "#fff"
+  iframe.style.width = "100vw"
+  iframe.style.maxWidth = "840px"
+  iframe.style.height = "620px"
+  iframe.style.backgroundColor = "rgba(0,0,0,0.6)"
   iframe.style.border = "none"
+  iframe.style.padding = "1rem"
   // round corners
   iframe.style.borderRadius = "40px"
   // box shadow
@@ -21,7 +23,7 @@ const applyModalStyle = (iframe: HTMLIFrameElement) => {
   background.style.bottom = "0"
   background.style.backgroundColor = "rgba(0, 0, 0, 0.5)"
   background.style.zIndex = "99999"
-    ; (background.style as any).backdropFilter = "blur(4px)"
+  ;(background.style as any).backdropFilter = "blur(4px)"
   background.appendChild(iframe)
 
   return background
@@ -57,8 +59,8 @@ export const createModal = async (targetUrl: string, shouldShow: boolean) => {
   const url = new URL(targetUrl)
   targetUrl = url.toString()
   const iframe = document.createElement("iframe")
-  iframe.src = targetUrl;
-  (iframe as any).loading = "eager"
+  iframe.src = targetUrl
+  ;(iframe as any).loading = "eager"
   iframe.sandbox.add(
     "allow-scripts",
     "allow-same-origin",
@@ -93,4 +95,3 @@ export const createModal = async (targetUrl: string, shouldShow: boolean) => {
 
   return { iframe, modal }
 }
-

@@ -6,20 +6,17 @@ import type {
 } from "@starknet-io/types-js"
 import {
   Account,
+  AccountInterface,
+  Call,
+  CallData,
   constants,
-  num,
   ProviderInterface,
+  RawArgs,
   RpcProvider,
-  WalletAccount,
 } from "starknet"
-import { TokenboundAccount } from "./account"
-import {
-  MAINNET_NODE_URL,
-  SEPOLIA_CHAIN_ID,
-  SEPOLIA_NODE_URL,
-} from "../constants"
 import { TBAStarknetWindowObject } from "../types/connector"
-import { checkTbaVersion, waitForWalletAccountAddress } from "../helpers/utils"
+import { checkTbaVersion } from "../helpers/utils"
+
 export const userEventHandlers: WalletEvents[] = []
 export type Variant = "argentX" | "argentWebWallet" | "TBA"
 
@@ -29,39 +26,32 @@ export interface TBAStarknetWindowObjectOptions {
   name: string
   version: string
   isConnected: boolean
-  parentAccountId: string
-  chainId: string
   selectedAddress: string
+  parentAccountId: string
   account: Account
-  provider: ProviderInterface
+  provider: RpcProvider
+  chainId: string
 }
 
-export const getTokenboundStarknetWindowObject = (
+export const getTokenboundControllerStarknetWindowObject = (
   options: TBAStarknetWindowObjectOptions,
   address: string,
-  parentWallet: StarknetWindowObject,
-  chainId: string,
 ): TBAStarknetWindowObject => {
-  const network = chainId == SEPOLIA_CHAIN_ID ? "sepolia" : "mainnet"
-  const provider = new RpcProvider({
-    nodeUrl: `https://starknet-${network}.g.alchemy.com/starknet/version/rpc/v0_7/4PHlmV2x26oj0up8xY3ZuqjhHb7mSvfQ`,
-  })
+  const { provider, account, chainId } = options
   const wallet: TBAStarknetWindowObject = {
     ...options,
-
     async request(call) {
       switch (call.type) {
         case "wallet_requestAccounts": {
           try {
-            const walletAccount = new WalletAccount(provider, parentWallet)
-            await waitForWalletAccountAddress(walletAccount)
             await updateStarknetWindowObject(
               chainId,
               provider,
               wallet,
               address,
-              walletAccount,
+              account,
             )
+
             return [address]
           } catch (error) {
             if (error instanceof Error) {
@@ -72,7 +62,7 @@ export const getTokenboundStarknetWindowObject = (
         }
 
         case "wallet_getPermissions": {
-          throw new Error("Not Implemented")
+          throw new Error("not implemented")
         }
 
         case "wallet_requestChainId": {
@@ -87,7 +77,6 @@ export const getTokenboundStarknetWindowObject = (
 
     on: (event, handleEvent) => {
       if (event === "accountsChanged") {
-        console.log(event)
         userEventHandlers.push({
           type: event,
           handler: handleEvent as AccountChangeEventHandler,
@@ -105,6 +94,7 @@ export const getTokenboundStarknetWindowObject = (
       if (event !== "accountsChanged" && event !== "networkChanged") {
         throw new Error(`Unknwown event: ${event}`)
       }
+
       const eventIndex = userEventHandlers.findIndex(
         (userEvent) =>
           userEvent.type === event && userEvent.handler === handleEvent,
@@ -121,14 +111,13 @@ export const getTokenboundStarknetWindowObject = (
 export async function updateStarknetWindowObject(
   chainId: string,
   provider: RpcProvider,
-  wallet: TBAStarknetWindowObject,
+  wallet: StarknetWindowObject,
   tokenboundAddress: string,
-  walletAccount: WalletAccount,
+  account: Account,
 ): Promise<TBAStarknetWindowObject> {
-  const { id, name, version, parentAccountId } = wallet
-  await walletAccount.getChainId()
-  const parentAccountAddress: string = walletAccount.address
+  const { id, name, version } = wallet
   const tbaVersion = await checkTbaVersion(provider, tokenboundAddress, chainId)
+
   const valuesToAssign: Pick<
     TBAStarknetWindowObject,
     | "id"
@@ -148,18 +137,50 @@ export async function updateStarknetWindowObject(
     icon: "light",
     version: version,
     isConnected: true,
-    chainId: num.toHex(chainId),
+    chainId,
     selectedAddress: tokenboundAddress,
-    parentAccount: parentAccountAddress,
-    parentAccountId: parentAccountId,
-    account: new TokenboundAccount(
+    parentAccountId: "catridge",
+    parentAccount: account.address,
+    account: new TokenboundControllerAccount(
       provider,
       tokenboundAddress,
-      tbaVersion ?? "V3",
-      walletAccount,
+      tbaVersion ?? "",
+      account,
     ),
     provider,
   }
-
   return Object.assign(wallet, valuesToAssign)
+}
+
+class TokenboundControllerAccount extends Account implements AccountInterface {
+  constructor(
+    provider: ProviderInterface,
+    public address: string,
+    public tbaVersion: string,
+    public parentAccount: Account,
+  ) {
+    super(provider, address, parentAccount.signer)
+  }
+  override execute = async (calls: Call[]) => {
+    try {
+      const transactions = Array.isArray(calls) ? calls : [calls]
+      const txns = transactions.map((call) => ({
+        contractAddress: call.contractAddress,
+        entrypoint: call.entrypoint,
+        calldata:
+          Array.isArray(call.calldata) && "__compiled__" in call.calldata
+            ? call.calldata
+            : CallData.compile(call.calldata as RawArgs),
+      }))
+      let callToBeExecuted: Call = {
+        contractAddress: this.address,
+        entrypoint: this.tbaVersion == "V2" ? "__execute__" : "execute",
+        calldata: CallData.compile({ txns }),
+      }
+      return await this.parentAccount.execute(callToBeExecuted)
+    } catch (error) {
+      console.log(error)
+      throw new Error("Error while executing a transaction")
+    }
+  }
 }
