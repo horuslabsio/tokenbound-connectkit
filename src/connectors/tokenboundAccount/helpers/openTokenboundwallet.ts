@@ -13,6 +13,7 @@ interface Options {
   address: string
   parentWallet: string
   controller: Account
+  action: string
 }
 
 export const getTarget = (): ShadowRoot => {
@@ -64,7 +65,11 @@ export const openTokenboundModal = async (
       "message",
       async (event: MessageEvent) => {
         if (event.origin != origin) return
-        const { address, parentWallet }: Options = event.data
+        const { address, parentWallet, action }: Options =
+          event.data
+        if (action === "closeConnectKit") {
+          hideModal(modal)
+        }
         if (!parentWallet || !address) return
         const wallet_id = parentWallet.toLowerCase()
         const globalObject: Record<string, any> = globalThis
