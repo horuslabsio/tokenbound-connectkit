@@ -16,11 +16,13 @@ export interface ConnectOptions extends GetWalletOptions {
   storeVersion?: StoreVersion | null
   resultType?: "connector" | "wallet"
   tokenboundOptions: TokenboundConnectorOptions
-
 }
 
 export interface ConnectOptionsWithConnectors
-  extends Omit<ConnectOptions, "webWalletUrl" | "argentMobileOptions | tokenboundOptions"> {
+  extends Omit<
+    ConnectOptions,
+    "webWalletUrl" | "argentMobileOptions | tokenboundOptions"
+  > {
   connectors?: StarknetkitConnector[]
 }
 
@@ -39,5 +41,3 @@ export type ModalResult = {
   connectorData: ConnectorData | null
   wallet?: TBAStarknetWindowObject | null
 }
-
-

@@ -57,7 +57,7 @@ export const openWebwallet = async (
   }
 
   const network = mapTargetUrlToNetworkId(origin)
-  
+
   const { allowedDapps } = await fetchAllowedDapps(network)
 
   if (allowedDapps.includes(window.location.hostname)) {
@@ -84,19 +84,12 @@ export const openWebwallet = async (
       { modal, iframe },
     )
     return starknetWindowObject
-
-    
-  }
-  
-  else {
+  } else {
     const windowProxyClient = trpcProxyClient({})
-   return await getWebWalletStarknetObject(
+    return await getWebWalletStarknetObject(
       origin,
       windowProxyClient,
       undefined,
     )
-
   }
-
-
 }
