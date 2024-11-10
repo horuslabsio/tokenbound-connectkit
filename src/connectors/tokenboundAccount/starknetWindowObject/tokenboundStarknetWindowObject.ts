@@ -4,13 +4,23 @@ import type {
   StarknetWindowObject,
   WalletEvents,
 } from "@starknet-io/types-js"
-import { Account, constants, ProviderInterface, RpcProvider, WalletAccount } from "starknet"
+import {
+  Account,
+  constants,
+  num,
+  ProviderInterface,
+  RpcProvider,
+  WalletAccount,
+} from "starknet"
 import { TokenboundAccount } from "./account"
-import { MAINNET_NODE_URL, SEPOLIA_CHAIN_ID, SEPOLIA_NODE_URL } from "../constants"
+import {
+  MAINNET_NODE_URL,
+  SEPOLIA_CHAIN_ID,
+  SEPOLIA_NODE_URL,
+} from "../constants"
 import { TBAStarknetWindowObject } from "../types/connector"
-
+import { checkTbaVersion, waitForWalletAccountAddress } from "../helpers/utils"
 export const userEventHandlers: WalletEvents[] = []
-
 export type Variant = "argentX" | "argentWebWallet" | "TBA"
 
 export interface TBAStarknetWindowObjectOptions {
@@ -19,14 +29,12 @@ export interface TBAStarknetWindowObjectOptions {
   name: string
   version: string
   isConnected: boolean
+  parentAccountId: string
   chainId: string
   selectedAddress: string
   account: Account
   provider: ProviderInterface
-
 }
-
-
 
 export const getTokenboundStarknetWindowObject = (
   options: TBAStarknetWindowObjectOptions,
@@ -34,42 +42,37 @@ export const getTokenboundStarknetWindowObject = (
   parentWallet: StarknetWindowObject,
   chainId: string,
 ): TBAStarknetWindowObject => {
-
-
-  const provider = new RpcProvider({ nodeUrl: chainId == SEPOLIA_CHAIN_ID ? SEPOLIA_NODE_URL : MAINNET_NODE_URL })
-
+  const network = chainId == SEPOLIA_CHAIN_ID ? "sepolia" : "mainnet"
+  const provider = new RpcProvider({
+    nodeUrl: `https://starknet-${network}.g.alchemy.com/starknet/version/rpc/v0_7/4PHlmV2x26oj0up8xY3ZuqjhHb7mSvfQ`,
+  })
   const wallet: TBAStarknetWindowObject = {
     ...options,
-    
+
     async request(call) {
       switch (call.type) {
         case "wallet_requestAccounts": {
           try {
-
-
-            const walletAccount =  new WalletAccount(provider, parentWallet)
-
+            const walletAccount = new WalletAccount(provider, parentWallet)
+            await waitForWalletAccountAddress(walletAccount)
             await updateStarknetWindowObject(
               chainId,
               provider,
               wallet,
               address,
-              walletAccount
-
+              walletAccount,
             )
-
             return [address]
-
           } catch (error) {
             if (error instanceof Error) {
               throw new Error(error.message)
             }
-            throw new Error('Unknown error on enable wallet')
+            throw new Error("Unknown error on enable wallet")
           }
         }
 
         case "wallet_getPermissions": {
-          throw new Error("not implemented")
+          throw new Error("Not Implemented")
         }
 
         case "wallet_requestChainId": {
@@ -84,6 +87,7 @@ export const getTokenboundStarknetWindowObject = (
 
     on: (event, handleEvent) => {
       if (event === "accountsChanged") {
+        console.log(event)
         userEventHandlers.push({
           type: event,
           handler: handleEvent as AccountChangeEventHandler,
@@ -98,72 +102,64 @@ export const getTokenboundStarknetWindowObject = (
       }
     },
     off: (event, handleEvent) => {
-      
       if (event !== "accountsChanged" && event !== "networkChanged") {
         throw new Error(`Unknwown event: ${event}`)
       }
-
-
       const eventIndex = userEventHandlers.findIndex(
-        (userEvent) => userEvent.type === event && userEvent.handler === handleEvent
+        (userEvent) =>
+          userEvent.type === event && userEvent.handler === handleEvent,
       )
-
 
       if (eventIndex >= 0) {
         userEventHandlers.splice(eventIndex, 1)
       }
-
     },
   }
   return wallet
 }
 
-
-
-
 export async function updateStarknetWindowObject(
   chainId: string,
-  provider: ProviderInterface,
-  wallet: StarknetWindowObject,
+  provider: RpcProvider,
+  wallet: TBAStarknetWindowObject,
   tokenboundAddress: string,
   walletAccount: WalletAccount,
-
 ): Promise<TBAStarknetWindowObject> {
-
-  const { id, name, version } = wallet;
-
-
-  // populate parent account address
+  const { id, name, version, parentAccountId } = wallet
   await walletAccount.getChainId()
-
+  const parentAccountAddress: string = walletAccount.address
+  const tbaVersion = await checkTbaVersion(provider, tokenboundAddress, chainId)
   const valuesToAssign: Pick<
     TBAStarknetWindowObject,
-    | 'id'
-    | 'name'
-    | 'icon'
-    | 'version'
-    | 'isConnected'
-    | 'chainId'
-    | 'selectedAddress'
-    | 'parentAccount'
-    | 'account'
-    | 'provider'
+    | "id"
+    | "name"
+    | "icon"
+    | "version"
+    | "isConnected"
+    | "chainId"
+    | "selectedAddress"
+    | "parentAccountId"
+    | "parentAccount"
+    | "account"
+    | "provider"
   > = {
     id: id,
     name: name,
     icon: "light",
     version: version,
     isConnected: true,
-    chainId,
+    chainId: num.toHex(chainId),
     selectedAddress: tokenboundAddress,
-    parentAccount: walletAccount.address,
+    parentAccount: parentAccountAddress,
+    parentAccountId: parentAccountId,
     account: new TokenboundAccount(
       provider,
       tokenboundAddress,
+      tbaVersion ?? "V3",
       walletAccount,
-    
     ),
     provider,
-  };
-  return Object.assign(wallet, valuesToAssign);
+  }
+
+  return Object.assign(wallet, valuesToAssign)
 }
