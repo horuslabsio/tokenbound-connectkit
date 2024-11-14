@@ -12,7 +12,7 @@ import {
   TokenboundClient,
 } from "starknet-tokenbound-sdk"
 import { GetClassHashError, GetTBAOwnerError } from "../../../errors"
-import sn from "@starknet-io/get-starknet-core"
+// import sn from "@starknet-io/get-starknet-core"
 
 export async function getTokenBoundClassHash(
   provider: Provider,
@@ -68,14 +68,17 @@ export default async function hasAccountOwnership(
   try {
     const owner = await tokenbound.getOwner({ tbaAddress: tokenboundAddress })
     const account = num.toHex(owner)
-    if (account) {
-      return account === parentAccountAddress
+    const formatedParentAddress = num.toHex(parentAccountAddress ?? "")
+    if (account && formatedParentAddress) {
+      return account === formatedParentAddress
     }
     return false
   } catch (e) {
     throw new GetTBAOwnerError()
   }
 }
+
+
 
 export async function waitForWalletAccountAddress(
   walletAccount: WalletAccount,
@@ -98,16 +101,16 @@ export async function waitForWalletAccountAddress(
   return checkAddress()
 }
 
-export async function hasApprove(parentAccountId: string): Promise<boolean> {
-  const authorizedWallets = await sn.getAuthorizedWallets()
-  const authorizedWallet = authorizedWallets.find(
-    (w) => w.id === parentAccountId,
-  )
-  if (authorizedWallet) {
-    return true
-  }
-  return false
-}
+// export async function hasApprove(parentAccountId: string): Promise<boolean> {
+//   const authorizedWallets = await sn.getAuthorizedWallets()
+//   const authorizedWallet = authorizedWallets.find(
+//     (w) => w.id === parentAccountId,
+//   )
+//   if (authorizedWallet) {
+//     return true
+//   }
+//   return false
+// }
 
 export async function checkTbaVersion(
   provider: RpcProvider,
