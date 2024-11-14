@@ -43,7 +43,6 @@
     rpc,
   })
 
-  let loading: boolean = true
 
   async function connect() {
     try {
@@ -61,7 +60,5 @@
     hideModal()
     await controller.probe()
     await connect()
-
-    loading = false
   })
 </script>

@@ -1,4 +1,4 @@
-import { Account, ProviderInterface } from "starknet"
+import { Account, RpcProvider } from "starknet"
 import { TOKENBOUND_ACCOUNT_ICON } from "../constants"
 import { TBAStarknetWindowObject } from "../types/connector"
 import { getTokenboundControllerStarknetWindowObject } from "./controllerStarknetWindowObject"
@@ -6,7 +6,7 @@ import { getTokenboundControllerStarknetWindowObject } from "./controllerStarkne
 interface Options {
   address: string
   account: Account
-  provider: ProviderInterface
+  provider: RpcProvider
   chainId: string
 }
 
@@ -17,6 +17,7 @@ export const getTokenboundAccountController = async ({
   chainId,
 }: Options): Promise<TBAStarknetWindowObject> => {
   const globalWindow = typeof window !== "undefined" ? window : undefined
+
   if (!globalWindow) {
     throw new Error("window is not defined")
   }

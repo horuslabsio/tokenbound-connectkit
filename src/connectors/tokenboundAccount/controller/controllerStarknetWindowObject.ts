@@ -115,7 +115,9 @@ export async function updateStarknetWindowObject(
   tokenboundAddress: string,
   account: Account,
 ): Promise<TBAStarknetWindowObject> {
+  
   const { id, name, version } = wallet
+
   const tbaVersion = await checkTbaVersion(provider, tokenboundAddress, chainId)
 
   const valuesToAssign: Pick<
@@ -172,6 +174,7 @@ class TokenboundControllerAccount extends Account implements AccountInterface {
             ? call.calldata
             : CallData.compile(call.calldata as RawArgs),
       }))
+
       let callToBeExecuted: Call = {
         contractAddress: this.address,
         entrypoint: this.tbaVersion == "V2" ? "__execute__" : "execute",
