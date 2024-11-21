@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+
 module.exports = {
   content: ["./src/**/*.{svelte,ts}"],
   darkMode: "class",
@@ -12,7 +13,7 @@ module.exports = {
         primary: "red"
       },
       backgroundImage: {
-        "overlay": "url('/bg.png')",
+        "overlay": "url('/src/assets/images/bg.png')",
       },
     },
   },

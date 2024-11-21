@@ -32,6 +32,7 @@ export const connect = async ({
 }: ConnectOptionsWithConnectors | ConnectOptions): Promise<ModalResult> => {
   const { tokenboundOptions } = restOptions as ConnectOptions
   const { connectors } = restOptions as ConnectOptionsWithConnectors
+
   selectedConnector = null
   const availableConnectors =
     !connectors || connectors.length === 0
@@ -39,6 +40,7 @@ export const connect = async ({
           tokenboundOptions,
         })
       : connectors
+
 
   const lastWalletId = localStorage.getItem("starknetLastConnectedWallet")
   if (modalMode === "neverAsk") {
@@ -62,7 +64,6 @@ export const connect = async ({
       throw new Error(error as any)
     }
   }
-
   const installedWallets = await sn.getAvailableWallets(restOptions)
   // we return/display wallet options once per first-dapp (ever) connect
   if (modalMode === "canAsk") {
@@ -103,6 +104,7 @@ export const connect = async ({
     customOrder: connectors ? connectors?.length > 0 : false,
   })
 
+
   const getTarget = (): ShadowRoot => {
     const modalId = "starknetkit-modal-container"
     const existingElement = document.getElementById(modalId)
@@ -137,6 +139,7 @@ export const connect = async ({
             if (!selectedConnector) throw new ConnectorNotConnectedError()
             const connectorData = (await connector?.connect()) ?? null
             if (!selectedConnector.wallet) return
+
             const {
               selectedAddress,
               parentAccount,
@@ -144,6 +147,8 @@ export const connect = async ({
               parentAccountId,
               provider,
             } = selectedConnector.wallet
+            
+
             if (parentAccount) {
               const isOwnerOfTBA = await hasAccountOwnership(
                 chainId,
@@ -153,6 +158,7 @@ export const connect = async ({
               )
               if (!isOwnerOfTBA) throw new NotTokenboundAccountOwner()
             }
+          
             const wallet =
               resultType === "wallet" ? selectedConnector.wallet : null
             if (wallet) {

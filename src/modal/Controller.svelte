@@ -1,13 +1,13 @@
 <script lang="ts">
   import { onMount } from "svelte"
   import Controller from "@cartridge/controller"
-  import { AccountInterface } from "starknet"
+  import { Account } from "starknet"
 
   export const ETH_CONTRACT =
     "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"
 
   export let onConnect: (
-    account: AccountInterface,
+    account: Account,
     controller: Controller,
   ) => void
 
@@ -47,9 +47,9 @@
   async function connect() {
     try {
       await controller.probe()
-      const account: AccountInterface = await controller.connect()
+      const account = await controller.connect()
       if (account) {
-        onConnect(account, controller)
+        onConnect(account , controller)
       }
     } catch (e) {
       console.log(e)

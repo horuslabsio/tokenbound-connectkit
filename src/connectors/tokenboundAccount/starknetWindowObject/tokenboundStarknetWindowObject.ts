@@ -42,7 +42,8 @@ export const getTokenboundStarknetWindowObject = (
   parentWallet: StarknetWindowObject,
   chainId: string,
 ): TBAStarknetWindowObject => {
-  const network = chainId == SEPOLIA_CHAIN_ID ? "sepolia" : "mainnet"
+
+  const network =  chainId == SEPOLIA_CHAIN_ID ? "sepolia" : "mainnet"
   const provider = new RpcProvider({
     nodeUrl: `https://starknet-${network}.g.alchemy.com/starknet/version/rpc/v0_7/4PHlmV2x26oj0up8xY3ZuqjhHb7mSvfQ`,
   })
@@ -87,7 +88,6 @@ export const getTokenboundStarknetWindowObject = (
 
     on: (event, handleEvent) => {
       if (event === "accountsChanged") {
-        console.log(event)
         userEventHandlers.push({
           type: event,
           handler: handleEvent as AccountChangeEventHandler,
