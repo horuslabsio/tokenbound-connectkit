@@ -5,15 +5,12 @@ const applyModalStyle = (iframe: HTMLIFrameElement) => {
   iframe.style.left = "50%"
   iframe.style.transform = "translate(-50%, -50%)"
   iframe.style.width = "100vw"
-  iframe.style.maxWidth = "840px"
-  iframe.style.height = "620px"
-  iframe.style.backgroundColor = "rgba(0,0,0,0.6)"
+  iframe.style.height = "100vh"
+  iframe.style.backgroundColor = "transparent"
   iframe.style.border = "none"
-  iframe.style.padding = "1rem"
-  // round corners
-  iframe.style.borderRadius = "40px"
-  // box shadow
-  iframe.style.boxShadow = "0px 4px 20px rgba(0, 0, 0, 0.5)"
+  iframe.style.opacity = "0"
+  iframe.style.transition = "opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)"
+
   const background = document.createElement("div")
   background.style.display = "none"
   background.style.position = "fixed"
@@ -21,10 +18,16 @@ const applyModalStyle = (iframe: HTMLIFrameElement) => {
   background.style.left = "0"
   background.style.right = "0"
   background.style.bottom = "0"
-  background.style.backgroundColor = "rgba(0, 0, 0, 0.5)"
+  background.style.transition =
+    "backgroundColor 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
   background.style.zIndex = "99999"
-  ;(background.style as any).backdropFilter = "blur(4px)"
+
   background.appendChild(iframe)
+
+  setTimeout(() => {
+    background.style.backgroundColor = "rgba(0,0,0,0.6)"
+    iframe.style.opacity = "1"
+  }, 500)
 
   return background
 }
