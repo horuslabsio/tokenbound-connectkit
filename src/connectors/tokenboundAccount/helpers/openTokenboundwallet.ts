@@ -2,7 +2,7 @@ import { getTokenboundAccountStarknetObject } from "../starknetWindowObject/getT
 import { openWebwallet } from "../webwallet/helpers/openWebwallet"
 import { TBAStarknetWindowObject } from "../types/connector"
 import { DEFAULT_WEBWALLET_URL, SEPOLIA_CHAIN_ID } from "../constants"
-import { Account, num, RpcProvider } from "starknet"
+import { Account, AccountInterface, num, RpcProvider } from "starknet"
 import ControllerModal from "../../../modal/Controller.svelte"
 import TokenboundModal from "../../../modal/TokenboundModal.svelte"
 import css from "../../../theme.css?inline"
@@ -26,7 +26,6 @@ export const getTarget = (): ShadowRoot => {
   const target = element.attachShadow({ mode: "open" })
   return target
 }
-
 
 const TokenboundModalTarget = (): ShadowRoot => {
   const modalId = "tokenbound-modal-container"
@@ -54,9 +53,9 @@ export const openTokenboundModal = async (
 > => {
   return new Promise<
     | {
-      starknetWindowObject?: TBAStarknetWindowObject
-      controller?: Controller
-    }
+        starknetWindowObject?: TBAStarknetWindowObject
+        controller?: Controller
+      }
     | undefined
   >((resolve) => {
     const modal = new TokenboundModal({
@@ -66,9 +65,11 @@ export const openTokenboundModal = async (
           modal.$destroy()
         },
 
-        callback: async (options: { address: string, parentWallet: string }) => {
-
-          const { address, parentWallet } = options;
+        callback: async (options: {
+          address: string
+          parentWallet: string
+        }) => {
+          const { address, parentWallet } = options
 
           if (!parentWallet || !address) {
             throw new Error("parent wallet or address is empty")
@@ -78,18 +79,17 @@ export const openTokenboundModal = async (
           let wallet: TBAStarknetWindowObject | undefined
 
           try {
-
             // Check wallet type and instantiate wallet accordingly
             if (wallet_id === "braavos" || wallet_id === "argentx") {
               wallet =
                 globalObject[
-                `starknet_${wallet_id === "argentx" ? "argentX" : wallet_id}`
+                  `starknet_${wallet_id === "argentx" ? "argentX" : wallet_id}`
                 ]
             }
 
             // Argent web wallet
             else if (wallet_id === "argentwebwallet") {
-              const origin = DEFAULT_WEBWALLET_URL;
+              const origin = DEFAULT_WEBWALLET_URL
               setPopupOptions({
                 origin,
                 location: "/interstitialLogin",
@@ -100,17 +100,17 @@ export const openTokenboundModal = async (
 
             // catridge controller
             else if (wallet_id === "controller") {
-              let account: Account | null = null
+              let accountInterface: AccountInterface | null = null
               const shadowTarget = getTarget()
               new ControllerModal({
                 target: shadowTarget,
                 props: {
                   onConnect: (
-                    connectedAccount: Account,
+                    accountInterface: AccountInterface,
                     controller: Controller,
                   ) => {
-                    account = connectedAccount
-                    handleAccount(account, controller)
+                    accountInterface = accountInterface
+                    handleAccount(accountInterface, controller)
                   },
                   hideModal: () => {
                     modal.$destroy()
@@ -123,23 +123,31 @@ export const openTokenboundModal = async (
               })
 
               async function handleAccount(
-                account: Account | null,
+                accountInterface: AccountInterface | null,
                 controller: Controller,
               ) {
-                const chainId = await account?.getChainId()
-                const provider = new RpcProvider({
-                  nodeUrl: account?.channel.nodeUrl,
-                })
-                if (account && chainId) {
-                  const starknetWindowObject =
-                    await getTokenboundAccountController({
-                      address,
-                      account,
-                      provider,
-                      chainId,
-                    })
-                  resolve({ starknetWindowObject, controller })
-                  modal.$destroy()
+                if (accountInterface) {
+                  const chainId = await accountInterface?.getChainId()
+
+                  const provider = new RpcProvider({
+                    nodeUrl: accountInterface?.channel.nodeUrl,
+                  })
+                  const account = new Account(
+                    provider,
+                    accountInterface?.address,
+                    accountInterface?.signer,
+                  )
+                  if (account && chainId) {
+                    const starknetWindowObject =
+                      await getTokenboundAccountController({
+                        address,
+                        account,
+                        provider,
+                        chainId,
+                      })
+                    resolve({ starknetWindowObject, controller })
+                    modal.$destroy()
+                  }
                 }
               }
               return
@@ -150,12 +158,12 @@ export const openTokenboundModal = async (
               return
             }
 
-            const starknetWindowObject = await getTokenboundAccountStarknetObject(
-              {
+            const starknetWindowObject =
+              await getTokenboundAccountStarknetObject({
                 address,
                 wallet,
                 chainId,
-              },)
+              })
             resolve({ starknetWindowObject })
             modal.$destroy()
           } catch (error) {
@@ -163,8 +171,7 @@ export const openTokenboundModal = async (
             resolve(undefined)
             modal.$destroy()
           }
-        }
-
+        },
       },
     })
   })

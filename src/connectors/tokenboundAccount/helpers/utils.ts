@@ -78,8 +78,6 @@ export default async function hasAccountOwnership(
   }
 }
 
-
-
 export async function waitForWalletAccountAddress(
   walletAccount: WalletAccount,
   delay = 500,

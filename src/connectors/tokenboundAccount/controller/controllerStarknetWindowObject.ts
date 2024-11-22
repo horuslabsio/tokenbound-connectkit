@@ -115,7 +115,6 @@ export async function updateStarknetWindowObject(
   tokenboundAddress: string,
   account: Account,
 ): Promise<TBAStarknetWindowObject | null> {
-
   if (!account) {
     return null
   }
@@ -153,8 +152,6 @@ export async function updateStarknetWindowObject(
     provider,
   }
   return Object.assign(wallet, valuesToAssign)
-
-
 }
 
 class TokenboundControllerAccount extends Account {
@@ -169,7 +166,7 @@ class TokenboundControllerAccount extends Account {
   override execute = async (calls: Call[]) => {
     try {
       const transactions = Array.isArray(calls) ? calls : [calls]
-      
+
       const txns = transactions.map((call) => ({
         contractAddress: call.contractAddress,
         entrypoint: call.entrypoint,
@@ -183,10 +180,9 @@ class TokenboundControllerAccount extends Account {
         {
           contractAddress: this.address,
           entrypoint: this.tbaVersion == "V2" ? "__execute__" : "execute",
-          calldata: CallData.compile({ txns })
+          calldata: CallData.compile({ txns }),
         },
       ])
-
     } catch (error) {
       console.log(error)
       throw new Error("Error while executing a transaction")

@@ -41,7 +41,6 @@ export const connect = async ({
         })
       : connectors
 
-
   const lastWalletId = localStorage.getItem("starknetLastConnectedWallet")
   if (modalMode === "neverAsk") {
     try {
@@ -104,7 +103,6 @@ export const connect = async ({
     customOrder: connectors ? connectors?.length > 0 : false,
   })
 
-
   const getTarget = (): ShadowRoot => {
     const modalId = "starknetkit-modal-container"
     const existingElement = document.getElementById(modalId)
@@ -147,7 +145,6 @@ export const connect = async ({
               parentAccountId,
               provider,
             } = selectedConnector.wallet
-            
 
             if (parentAccount) {
               const isOwnerOfTBA = await hasAccountOwnership(
@@ -158,7 +155,7 @@ export const connect = async ({
               )
               if (!isOwnerOfTBA) throw new NotTokenboundAccountOwner()
             }
-          
+
             const wallet =
               resultType === "wallet" ? selectedConnector.wallet : null
             if (wallet) {

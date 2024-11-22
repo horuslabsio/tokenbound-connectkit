@@ -1,8 +1,8 @@
-import { resolve } from "path";
-import { svelte } from "@sveltejs/vite-plugin-svelte";
-import { defineConfig } from "vite";
-import dts from "vite-plugin-dts";
-import replace from "@rollup/plugin-replace"; // Use the Rollup version of replace
+import { resolve } from "path"
+import { svelte } from "@sveltejs/vite-plugin-svelte"
+import { defineConfig } from "vite"
+import dts from "vite-plugin-dts"
+import replace from "@rollup/plugin-replace" // Use the Rollup version of replace
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -33,8 +33,8 @@ export default defineConfig({
       preventAssignment: true,
       // Replace eval with a no-op function to bypass eval usage
       values: {
-        'eval': '(() => {})'
-      }
+        eval: "(() => {})",
+      },
     }),
   ],
-});
+})

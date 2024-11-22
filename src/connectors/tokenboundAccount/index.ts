@@ -23,10 +23,7 @@ import {
   type ConnectorData,
   type ConnectorIcons,
 } from "../connector"
-import {
-  DEFAULT_CHAIN_ID,
-  TOKENBOUND_ACCOUNT_ICON,
-} from "./constants"
+import { DEFAULT_CHAIN_ID, TOKENBOUND_ACCOUNT_ICON } from "./constants"
 import { openTokenboundModal } from "./helpers/openTokenboundwallet"
 import { TBAStarknetWindowObject } from "./types/connector"
 import Controller from "@cartridge/controller"
@@ -169,10 +166,7 @@ export class TokenboundConnector extends Connector {
     const hexChainId = this._options
       ? BigInt(getStarknetChainId(this._options.chainId))
       : BigInt(getStarknetChainId(DEFAULT_CHAIN_ID))
-    let _wallet =
-      (await openTokenboundModal(
-        hexChainId.toString(),
-      )) ?? null
+    let _wallet = (await openTokenboundModal(hexChainId.toString())) ?? null
     if (!_wallet) return
     const { starknetWindowObject, controller } = _wallet
     if (starknetWindowObject) {
