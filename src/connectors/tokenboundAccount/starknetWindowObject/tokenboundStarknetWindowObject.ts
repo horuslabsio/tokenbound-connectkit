@@ -87,7 +87,6 @@ export const getTokenboundStarknetWindowObject = (
 
     on: (event, handleEvent) => {
       if (event === "accountsChanged") {
-        console.log(event)
         userEventHandlers.push({
           type: event,
           handler: handleEvent as AccountChangeEventHandler,

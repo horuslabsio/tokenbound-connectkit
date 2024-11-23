@@ -1,4 +1,3 @@
-import { type AccountChangeEventHandler } from "@starknet-io/get-starknet-core"
 import {
   AccountInterface,
   ProviderInterface,
@@ -24,15 +23,11 @@ import {
   type ConnectorData,
   type ConnectorIcons,
 } from "../connector"
-import {
-  DEFAULT_CHAIN_ID,
-  DEFAULT_TOKENBOUNDACCOUNT_URL,
-  TOKENBOUND_ACCOUNT_ICON,
-} from "./constants"
+import { DEFAULT_CHAIN_ID, TOKENBOUND_ACCOUNT_ICON } from "./constants"
 import { openTokenboundModal } from "./helpers/openTokenboundwallet"
 import { TBAStarknetWindowObject } from "./types/connector"
 import Controller from "@cartridge/controller"
-import hasAccountOwnership from "./helpers/utils"
+import { AccountChangeEventHandler } from "@starknet-io/get-starknet-core"
 
 export interface TokenboundConnectorOptions {
   chainId: string
@@ -116,7 +111,6 @@ export class TokenboundConnector extends Connector {
     }
 
     if (this._controller) {
-      console.log(this._controller)
       this._controller.disconnect()
     }
     this._wallet = null
@@ -154,15 +148,12 @@ export class TokenboundConnector extends Connector {
       throw new UserRejectedRequestError()
     }
   }
-
   async initEventListener(accountChangeCb: AccountChangeEventHandler) {
     if (!this._wallet) {
       throw new ConnectorNotConnectedError()
     }
-    console.log(this.wallet)
     this._wallet.on("accountsChanged", accountChangeCb)
   }
-
   async removeEventListener(accountChangeCb: AccountChangeEventHandler) {
     if (!this._wallet) {
       throw new ConnectorNotConnectedError()
@@ -175,11 +166,7 @@ export class TokenboundConnector extends Connector {
     const hexChainId = this._options
       ? BigInt(getStarknetChainId(this._options.chainId))
       : BigInt(getStarknetChainId(DEFAULT_CHAIN_ID))
-    let _wallet =
-      (await openTokenboundModal(
-        DEFAULT_TOKENBOUNDACCOUNT_URL,
-        hexChainId.toString(),
-      )) ?? null
+    let _wallet = (await openTokenboundModal(hexChainId.toString())) ?? null
     if (!_wallet) return
     const { starknetWindowObject, controller } = _wallet
     if (starknetWindowObject) {

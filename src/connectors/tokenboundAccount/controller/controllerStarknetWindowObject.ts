@@ -114,10 +114,12 @@ export async function updateStarknetWindowObject(
   wallet: StarknetWindowObject,
   tokenboundAddress: string,
   account: Account,
-): Promise<TBAStarknetWindowObject> {
+): Promise<TBAStarknetWindowObject | null> {
+  if (!account) {
+    return null
+  }
   const { id, name, version } = wallet
   const tbaVersion = await checkTbaVersion(provider, tokenboundAddress, chainId)
-
   const valuesToAssign: Pick<
     TBAStarknetWindowObject,
     | "id"
@@ -152,7 +154,7 @@ export async function updateStarknetWindowObject(
   return Object.assign(wallet, valuesToAssign)
 }
 
-class TokenboundControllerAccount extends Account implements AccountInterface {
+class TokenboundControllerAccount extends Account {
   constructor(
     provider: ProviderInterface,
     public address: string,
@@ -164,6 +166,7 @@ class TokenboundControllerAccount extends Account implements AccountInterface {
   override execute = async (calls: Call[]) => {
     try {
       const transactions = Array.isArray(calls) ? calls : [calls]
+
       const txns = transactions.map((call) => ({
         contractAddress: call.contractAddress,
         entrypoint: call.entrypoint,
@@ -172,12 +175,14 @@ class TokenboundControllerAccount extends Account implements AccountInterface {
             ? call.calldata
             : CallData.compile(call.calldata as RawArgs),
       }))
-      let callToBeExecuted: Call = {
-        contractAddress: this.address,
-        entrypoint: this.tbaVersion == "V2" ? "__execute__" : "execute",
-        calldata: CallData.compile({ txns }),
-      }
-      return await this.parentAccount.execute(callToBeExecuted)
+
+      return await this.parentAccount.execute([
+        {
+          contractAddress: this.address,
+          entrypoint: this.tbaVersion == "V2" ? "__execute__" : "execute",
+          calldata: CallData.compile({ txns }),
+        },
+      ])
     } catch (error) {
       console.log(error)
       throw new Error("Error while executing a transaction")

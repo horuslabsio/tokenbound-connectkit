@@ -30,7 +30,7 @@ export class GetTBAOwnerFailure extends Error {
 
 export class NotTokenboundAccountOwner extends Error {
   name = "NotTokenboundAccountOwner"
-  message = "User is not the Token Bound Account owner."
+  message = "Selected wallet is not owner of tokenbound account"
 }
 
 export class NotAuthorizedError extends Error {
