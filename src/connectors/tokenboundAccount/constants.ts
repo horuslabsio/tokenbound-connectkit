@@ -54,8 +54,7 @@ export const AccountClassHashes = {
       "0x45d67b8590561c9b54e14dd309c9f38c4e2c554dd59414021f9d079811621bd",
   },
   V3: {
-    mainnet:
-      "0xbe8863311f24317dff8af16deb1285ec5b035e57cf9beda545c341c339b925",
+    mainnet: "0xbe8863311f24317dff8af16deb1285ec5b035e57cf9beda545c341c339b925",
     sepolia:
       "0x29d2a1b11dd97289e18042502f11356133a2201dd19e716813fb01fbee9e9a4",
   },

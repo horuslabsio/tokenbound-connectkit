@@ -99,17 +99,6 @@ export async function waitForWalletAccountAddress(
   return checkAddress()
 }
 
-// export async function hasApprove(parentAccountId: string): Promise<boolean> {
-//   const authorizedWallets = await sn.getAuthorizedWallets()
-//   const authorizedWallet = authorizedWallets.find(
-//     (w) => w.id === parentAccountId,
-//   )
-//   if (authorizedWallet) {
-//     return true
-//   }
-//   return false
-// }
-
 export async function checkTbaVersion(
   provider: RpcProvider,
   tokenboundAddress: string,
