@@ -12,6 +12,7 @@ import {
   TokenboundClient,
 } from "starknet-tokenbound-sdk"
 import { GetClassHashError, GetTBAOwnerError } from "../../../errors"
+import { version } from "os"
 // import sn from "@starknet-io/get-starknet-core"
 
 export async function getTokenBoundClassHash(
@@ -38,30 +39,17 @@ export default async function hasAccountOwnership(
     num.toHex(chainId) === SEPOLIA_CHAIN_ID
       ? SEPOLIA_NODE_URL
       : MAINNET_NODE_URL
+
   const tbaClassHash = await getTokenBoundClassHash(provider, tokenboundAddress)
+
   if (!tbaClassHash) return false
   const network =
     num.toHex(chainId) === SEPOLIA_CHAIN_ID ? "sepolia" : "mainnet"
-  const implementations = {
-    [TBAVersion.V2]:
-      AccountClassHashes.V2[network as keyof typeof AccountClassHashes.V2],
-    [TBAVersion.V3]:
-      AccountClassHashes.V3[network as keyof typeof AccountClassHashes.V3],
-  }
-
-  let version: (typeof TBAVersion)[keyof typeof TBAVersion] | null = null
-
-  for (const [ver, impl] of Object.entries(implementations)) {
-    if (tbaClassHash === impl) {
-      version = ver as (typeof TBAVersion)[keyof typeof TBAVersion]
-      break
-    }
-  }
-  if (!version) return false
   const options = {
     walletClient: { address: "", privateKey: "" },
     chain_id: network === "sepolia" ? TBAChainID.sepolia : TBAChainID.main,
-    version,
+    implementationAddress: tbaClassHash,
+    version: TBAVersion.V3,
     jsonRPC: NODE_URL,
   }
   const tokenbound = new TokenboundClient(options)
@@ -91,11 +79,9 @@ export async function waitForWalletAccountAddress(
     if (Date.now() - startTime >= maxWaitTime) {
       throw new Error("Timeout: walletAccount.address did not populate in time")
     }
-
     await new Promise((resolve) => setTimeout(resolve, delay))
     return checkAddress()
   }
-
   return checkAddress()
 }
 
@@ -110,7 +96,6 @@ export async function checkTbaVersion(
       provider,
       tokenboundAddress,
     )
-
     if (!tbaClassHash) return ""
     const network =
       num.toHex(chainId) === SEPOLIA_CHAIN_ID ? "sepolia" : "mainnet"
