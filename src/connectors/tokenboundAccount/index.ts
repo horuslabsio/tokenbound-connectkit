@@ -29,8 +29,15 @@ import { TBAStarknetWindowObject } from "./types/connector"
 import Controller from "@cartridge/controller"
 import { AccountChangeEventHandler } from "@starknet-io/get-starknet-core"
 
+interface PolicyOption {
+  target: string
+  method: string
+  description: string
+}
+
 export interface TokenboundConnectorOptions {
   chainId: string
+  policies?: PolicyOption[]
 }
 
 export class TokenboundConnector extends Connector {
@@ -166,7 +173,13 @@ export class TokenboundConnector extends Connector {
     const hexChainId = this._options
       ? BigInt(getStarknetChainId(this._options.chainId))
       : BigInt(getStarknetChainId(DEFAULT_CHAIN_ID))
-    let _wallet = (await openTokenboundModal(hexChainId.toString())) ?? null
+
+    let _wallet =
+      (await openTokenboundModal(
+        hexChainId.toString(),
+        this._options.policies,
+      )) ?? null
+
     if (!_wallet) return
     const { starknetWindowObject, controller } = _wallet
     if (starknetWindowObject) {

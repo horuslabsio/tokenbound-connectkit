@@ -7,7 +7,7 @@ import ControllerModal from "../../../modal/Controller.svelte"
 import TokenboundModal from "../../../modal/TokenboundModal.svelte"
 import css from "../../../theme.css?inline"
 import { getTokenboundAccountController } from "../controller/getControllerStarknetWindowObject"
-import Controller from "@cartridge/controller"
+import Controller, { Policy } from "@cartridge/controller"
 import { setPopupOptions } from "../webwallet/helpers/trpc"
 
 export const getTarget = (): ShadowRoot => {
@@ -47,6 +47,7 @@ const TokenboundModalTarget = (): ShadowRoot => {
 
 export const openTokenboundModal = async (
   chainId: string,
+  policies?: Policy[],
 ): Promise<
   | { starknetWindowObject?: TBAStarknetWindowObject; controller?: Controller }
   | undefined
@@ -112,6 +113,7 @@ export const openTokenboundModal = async (
                     accountInterface = accountInterface
                     handleAccount(accountInterface, controller)
                   },
+                  policies: policies,
                   hideModal: () => {
                     modal.$destroy()
                   },
