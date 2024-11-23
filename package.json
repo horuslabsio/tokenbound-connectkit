@@ -111,5 +111,5 @@
   "peerDependencies": {
     "starknet": "^6.11.0"
   },
-  "gitHead": "b16688a8638cc138938e74e1a39d004760165d75"
+  "gitHead": "b16688a8638cc138938e74e1a39d004760165d75",
 }
